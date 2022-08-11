@@ -34,6 +34,11 @@ export function* generateSchema(
     return
   }
 
+  if (schema.$ref) {
+    yield `export type ${safeName} = ${getSchemaNameFromRef(schema.$ref)}`
+    return
+  }
+
   switch (schema.type) {
     case 'object':
       yield `export interface ${safeName} {`
@@ -60,15 +65,19 @@ export function* generateSchema(
   }
 }
 
+function getSchemaNameFromRef($ref: string) {
+  const schemaPath = '#/components/schemas/'
+  if (!$ref.startsWith(schemaPath))
+    throw new Error(`Unsupported: $refs must start with ${schemaPath}`)
+  return makeSafeTypeIdentifier($ref.substring(schemaPath.length))
+}
+
 export function getTypeName(
   schema: Swagger.Schema3 | Swagger.BaseSchema | undefined,
 ): string {
   if (schema === undefined) return 'unknown'
   if (schema.$ref) {
-    const schemaPath = '#/components/schemas/'
-    if (!schema.$ref.startsWith(schemaPath))
-      throw new Error(`Unsupported: $refs must start with ${schemaPath}`)
-    return makeSafeTypeIdentifier(schema.$ref.substring(schemaPath.length))
+    return getSchemaNameFromRef(schema.$ref)
   }
   switch (schema.type) {
     case 'integer':
@@ -82,6 +91,7 @@ export function getTypeName(
           .map(x => (typeof x === 'string' ? `'${x}'` : x))
           .join(' | ')
       }
+      if (schema.format === 'binary') return 'File'
       return 'string'
     case 'array':
       return `Array<${getTypeName(schema.items)}>`

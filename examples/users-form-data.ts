@@ -41,42 +41,46 @@ export const toFormData = (o: Record<string, any>): FormData => {
   Object.entries(o).forEach(([key, data]) => fd.append(key, data))
   return fd
 }
-export type Pet =
-  & NewPet
-  & {id: number}
-export interface NewPet {
+export interface User {
+  id: number
+  email: string
   name: string
-  tag?: string
+  status?: 'Happy' | 'Sad'
+  phoneNumbers: Array<string>
 }
-export interface Error {
-  code: number
-  message: string
+export interface Pick_User_email_or_name_or_phoneNumbers_ {
+  email: string
+  name: string
+  phoneNumbers: Array<string>
 }
+export type UserCreationParams = Pick_User_email_or_name_or_phoneNumbers_
 export abstract class RequestFactory {
-  static findPets({ tags, limit, }: { tags?: Array<string>, limit?: number, }): GetRequest<Array<Pet>> {
-    const query = toQuery({ tags, limit })
+  static getUser({ userId, name, }: { userId: number, name?: string, }): GetRequest<User> {
+    const query = toQuery({ userId, name })
     return {
       method: 'GET',
-      url: `/pets${query}`,
+      url: `/users/${userId}${query}`,
     }
   }
-  static addPet({ body, }: { body: NewPet, }): PostRequest<NewPet, Pet> {
+  static createUser({ body, }: { body: UserCreationParams, }): PostRequest<UserCreationParams, undefined> {
     return {
       method: 'POST',
-      url: '/pets',
+      url: '/users',
       data: body,
     }
   }
-  static findPetById({ id, }: { id: number, }): GetRequest<Pet> {
+  static getAvatar({ userId, }: { userId: number, }): GetRequest<Blob> {
     return {
       method: 'GET',
-      url: `/pets/${id}`,
+      url: `/users/${userId}/avatar`,
     }
   }
-  static deletePet({ id, }: { id: number, }): DeleteRequest<undefined> {
+  static postAvatar({ body, userId, }: { body: {title: string, file: File}, userId: number, }): PostRequest<FormData, undefined> {
+    const formData = toFormData(body)
     return {
-      method: 'DELETE',
-      url: `/pets/${id}`,
+      method: 'POST',
+      url: `/users/${userId}/avatar`,
+      data: formData,
     }
   }
 }

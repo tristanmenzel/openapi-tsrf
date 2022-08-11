@@ -61,3 +61,13 @@ export function* generateQueryHelper(): AsyncDocumentParts {
   yield DecIndent
   yield '}'
 }
+
+export function* generateFormDataHelper(): AsyncDocumentParts {
+  yield 'export const toFormData = (o: Record<string, any>): FormData => {'
+  yield IncIndent
+  yield 'const fd = new FormData()'
+  yield 'Object.entries(o).forEach(([key, data]) => fd.append(key, data))'
+  yield 'return fd'
+  yield DecIndent
+  yield '}'
+}

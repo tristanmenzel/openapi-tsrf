@@ -13,7 +13,7 @@ export function* generateOperation(
   operation: Swagger.Operation3,
 ): AsyncDocumentParts {
   yield InlineMode
-  const requestBodyType = getRequestBodyType()
+  const [requestFormat, requestBodyType] = getRequestBodyType()
   const responseBodyType = getResponseBodyType()
   const hasQuery = Boolean(operation.parameters?.some(p => p.in === 'query'))
   yield `static ${makeSafeMethodIdentifier(operation.operationId)}(`
@@ -42,7 +42,8 @@ export function* generateOperation(
       break
   }
   // Request body type
-  if (requestBodyType) yield `${requestBodyType}, `
+  if (requestFormat === 'json' && requestBodyType) yield `${requestBodyType}, `
+  if (requestFormat === 'form') yield 'FormData, '
   // Response body type
   yield responseBodyType
 
@@ -54,11 +55,15 @@ export function* generateOperation(
       .parameters!.map(p => p.name)
       .join(', ')} })`
   }
+  if (requestFormat === 'form') {
+    yield 'const formData = toFormData(body)'
+  }
   yield 'return {'
   yield IncIndent
   yield `method: '${method.toUpperCase()}',`
   yield `url: ${getUrlTemplate(hasQuery)},`
-  if (requestBodyType) yield 'data: body,'
+  if (requestFormat === 'json' && requestBodyType) yield 'data: body,'
+  if (requestFormat === 'form' && requestBodyType) yield 'data: formData,'
   yield DecIndent
   yield '}'
   yield DecIndent
@@ -94,42 +99,60 @@ export function* generateOperation(
     return queryPattern ? `\`${path}${queryPattern}\`` : `'${path}'`
   }
 
-  function getRequestBodyType(): string | undefined {
+  function getRequestBodyType(): ['json' | 'form' | 'na', string | undefined] {
     switch (method) {
       case 'put':
       case 'post':
       case 'patch':
         if (operation.requestBody) {
-          return getTypeName(
-            operation.requestBody.content?.['application/json']?.schema,
-          )
+          if (operation.requestBody.content['multipart/form-data'])
+            return [
+              'form',
+              getTypeName(
+                operation.requestBody.content['multipart/form-data'].schema,
+              ),
+            ]
+          return [
+            'json',
+            getTypeName(
+              operation.requestBody.content?.['application/json']?.schema,
+            ),
+          ]
         } else if (operation.parameters?.some(p => p.in === 'body')) {
-          return getTypeName(
-            operation.parameters?.find(p => p.in === 'body')?.schema,
-          )
+          return [
+            'json',
+            getTypeName(
+              operation.parameters?.find(p => p.in === 'body')?.schema,
+            ),
+          ]
         } else {
-          return 'unknown'
+          return ['json', 'unknown']
         }
     }
-    return undefined
+    return ['na', undefined]
   }
 
   function getResponseBodyType(): string {
-    const successOrDefaultResponse =
-      iterateDictionary(operation.responses).find(
-        ([code]) => Number(code) >= 200 && Number(code) < 300,
-      ) ??
+    const [code, response] = iterateDictionary(operation.responses).find(
+      ([code]) => Number(code) >= 200 && Number(code) < 300,
+    ) ??
       iterateDictionary(operation.responses).find(
         ([code]) => code === 'default',
-      )
-    if (
-      successOrDefaultResponse === undefined ||
-      successOrDefaultResponse[0] === '203' ||
-      successOrDefaultResponse[1].content?.['application/json'] === undefined
-    )
+      ) ?? [undefined, undefined]
+    if (code === undefined || code === '203' || response.content === undefined)
       return 'undefined'
-    return getTypeName(
-      successOrDefaultResponse[1].content?.['application/json'].schema,
-    )
+    if (response.content['application/json'] === undefined) {
+      if (
+        Object.values(response.content).some(
+          mediaType =>
+            mediaType.schema.type === 'file' ||
+            (mediaType.schema.type === 'string' &&
+              ['byte', 'binary'].includes(mediaType.schema.format!)),
+        )
+      ) {
+        return 'Blob'
+      }
+    }
+    return getTypeName(response.content['application/json'].schema)
   }
 }

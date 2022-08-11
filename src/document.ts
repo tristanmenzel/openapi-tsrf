@@ -1,7 +1,11 @@
 import type { Swagger } from './swagger'
 import type { AsyncDocumentParts } from './output'
 import { DecIndent, IncIndent } from './output'
-import { generateQueryHelper, generateRequestTypes } from './static-generators'
+import {
+  generateFormDataHelper,
+  generateQueryHelper,
+  generateRequestTypes,
+} from './static-generators'
 import { iterateDictionary, methods } from './iteration-helpers'
 import { generateSchema } from './schemas'
 import { generateOperation } from './operations'
@@ -11,7 +15,7 @@ export function* generateDocumentParts(
 ): AsyncDocumentParts {
   yield* generateRequestTypes()
   yield* generateQueryHelper()
-
+  yield* generateFormDataHelper()
   for (const [name, schemaObj] of iterateDictionary(
     document.components.schemas,
   )) {

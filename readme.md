@@ -123,7 +123,6 @@ const pets = await PetStoreApi.listPets({ credentials: 'omit' }, { limit: 5 })
 
 ## Requirements / Limitations
 
- - Only 'application/json' requests and responses are supported, form data will be added at some point though
  - All operations must have a unique operationId set as this is used for the name of the RequestFactory method
  - Only parts of the openapi3 spec included in the examples/*.json files have been tested
 

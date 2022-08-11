@@ -40,4 +40,7 @@ describe('Test examples', () => {
   it('Uspto', () => {
     testExample('uspto', writeActuals)
   })
+  it('Users form data', () => {
+    testExample('users-form-data', writeActuals)
+  })
 })

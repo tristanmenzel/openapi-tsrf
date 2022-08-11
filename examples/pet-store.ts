@@ -36,6 +36,11 @@ export const toQuery = (o: {[key: string]: any}): string => {
     .join('&')
   return q ? `?${q}` : ''
 }
+export const toFormData = (o: Record<string, any>): FormData => {
+  const fd = new FormData()
+  Object.entries(o).forEach(([key, data]) => fd.append(key, data))
+  return fd
+}
 export interface Pet {
   id: number
   name: string
