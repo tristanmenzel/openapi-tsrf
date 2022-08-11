@@ -105,10 +105,19 @@ const factory = new ApiProxyFactory<RequestConfig>(
 
 const PetStoreApi = factory.createProxy(RequestFactory)
 
-const pets = await PetStoreApi.listPets()
+const pets = await PetStoreApi.listPets({ limit: 5 })
 const specificPet = await PetStoreApi.showPetById(123)
 
 const petsNoCredentials = await PetStoreApi.listPets.withConfig({credentials: 'omit'}).execute({limit: 10})
+
+```
+
+If you want to create a proxy which forces the consumer to provide config with each request, use the `createProxyWithRequiredConfig` factory method. Request methods will now take `config` as their first parameter instead of via the `.withConfig` method. 
+
+```ts
+const PetStoreApi = factory.createProxyWithRequiredConfig(RequestFactory)
+
+const pets = await PetStoreApi.listPets({ credentials: 'omit' }, { limit: 5 })
 
 ```
 

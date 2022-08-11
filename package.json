@@ -1,6 +1,6 @@
 {
   "name": "openapi-tsrf",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Generates request factories for all discovered operations in an open api 3 document",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
