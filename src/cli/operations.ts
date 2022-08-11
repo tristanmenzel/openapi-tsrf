@@ -126,7 +126,7 @@ export function* generateOperation(
             ),
           ]
         } else {
-          return ['json', 'unknown']
+          return ['na', undefined]
         }
     }
     return ['na', undefined]
