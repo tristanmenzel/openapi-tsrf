@@ -1,6 +1,6 @@
 /* eslint-disable */
-import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf'
-import { toQuery, toFormData } from 'openapi-tsrf'
+import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf-runtime'
+import { toQuery, toFormData } from 'openapi-tsrf-runtime'
 export interface dataSetList {
   total?: number
   apis?: Array<{apiKey?: string, apiVersionNumber?: string, apiUrl?: string, apiDocumentationUrl?: string}>

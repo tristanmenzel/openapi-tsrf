@@ -1,5 +1,5 @@
-import type { AnyRequest, GetRequest } from '../src'
-import { ApiProxyFactory } from '../src'
+import type { AnyRequest, GetRequest } from '../src/runtime'
+import { ApiProxyFactory } from '../src/runtime'
 
 export abstract class RequestFactory {
   static getThings(

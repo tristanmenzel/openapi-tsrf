@@ -1,5 +1,5 @@
-import { generateDocumentParts, writeDocumentPartsToString } from '../src'
-import { loadOpenApi3 } from '../src/util'
+import { generateDocumentParts, writeDocumentPartsToString } from '../src/cli'
+import { loadOpenApi3 } from '../src/cli/util'
 import * as path from 'path'
 import * as fs from 'fs'
 

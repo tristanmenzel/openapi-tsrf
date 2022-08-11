@@ -17,7 +17,8 @@ A request object includes
 Install from npm
 
 ```shell
-npm i -D openapi-tsrf
+npm i -D openapi-tsrf-cli
+npm i -S openapi-tsrf-runtime
 ```
 
 Add a new script to your package.json 

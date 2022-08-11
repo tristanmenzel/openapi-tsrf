@@ -38,9 +38,18 @@ jobs:
       - name: Run build
         run: npm run build
 
-      - name: Publish (if version has been updated)
+      - name: Publish (cli) (if version has been updated)
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
           access: "public"
+          package: 'dist/cli/package.json'
+          check-version: true
+
+      - name: Publish (runtime) (if version has been updated)
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          access: "public"
+          package: 'dist/runtime/package.json'
           check-version: true

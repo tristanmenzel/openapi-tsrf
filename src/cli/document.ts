@@ -9,8 +9,8 @@ import { generateOperation } from './operations'
 export function* generateDocumentParts(
   document: Swagger.Spec3,
 ): AsyncDocumentParts {
-  yield "import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf'"
-  yield "import { toQuery, toFormData } from 'openapi-tsrf'"
+  yield "import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf-runtime'"
+  yield "import { toQuery, toFormData } from 'openapi-tsrf-runtime'"
   for (const [name, schemaObj] of iterateDictionary(
     document.components.schemas,
   )) {
