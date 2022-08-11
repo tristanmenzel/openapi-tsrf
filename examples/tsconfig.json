@@ -25,7 +25,7 @@
     "outDir": "dist",
     "noEmit": true,
     "paths": {
-      "openapi-tsrf": ["../src/request-types.ts"]
+      "openapi-tsrf": ["../src/index.ts"]
     }
   },
   "include": [

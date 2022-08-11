@@ -1,11 +1,7 @@
 import type { Swagger } from './swagger'
 import type { AsyncDocumentParts } from './output'
 import { DecIndent, IncIndent } from './output'
-import {
-  generateFormDataHelper,
-  generateImportRequestTypes,
-  generateQueryHelper,
-} from './static-generators'
+
 import { iterateDictionary, methods } from './iteration-helpers'
 import { generateSchema } from './schemas'
 import { generateOperation } from './operations'
@@ -13,9 +9,8 @@ import { generateOperation } from './operations'
 export function* generateDocumentParts(
   document: Swagger.Spec3,
 ): AsyncDocumentParts {
-  yield* generateImportRequestTypes()
-  yield* generateQueryHelper()
-  yield* generateFormDataHelper()
+  yield "import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf'"
+  yield "import { toQuery, toFormData } from 'openapi-tsrf'"
   for (const [name, schemaObj] of iterateDictionary(
     document.components.schemas,
   )) {
