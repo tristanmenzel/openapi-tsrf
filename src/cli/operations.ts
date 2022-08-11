@@ -65,6 +65,7 @@ export function* generateOperation(
   yield `url: ${getUrlTemplate(hasQuery)},`
   if (requestFormat === 'json' && requestBodyType) yield 'data: body,'
   if (requestFormat === 'form' && requestBodyType) yield 'data: formData,'
+  if (requestFormat === 'empty' && requestBodyType) yield 'data: undefined,'
   yield DecIndent
   yield '}'
   yield DecIndent
