@@ -23,9 +23,13 @@
 
     "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
     "outDir": "dist",
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "openapi-tsrf": ["../src/request-types.ts"]
+    }
   },
   "include": [
     "./*.ts"
-  ]
+  ],
+
 }

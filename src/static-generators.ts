@@ -1,46 +1,8 @@
 import type { AsyncDocumentParts } from './index'
 import { DecIndent, IncIndent } from './index'
 
-export function* generateRequestTypes(): AsyncDocumentParts {
-  yield 'export interface GetRequest<TResponse> {'
-  yield IncIndent
-  yield 'url: string'
-  yield "method: 'GET'"
-  yield DecIndent
-  yield '}'
-  yield 'export interface OptionsRequest<TResponse> {'
-  yield IncIndent
-  yield 'url: string'
-  yield "method: 'OPTIONS'"
-  yield DecIndent
-  yield '}'
-  yield 'export interface DeleteRequest<TResponse> {'
-  yield IncIndent
-  yield 'url: string'
-  yield "method: 'DELETE'"
-  yield DecIndent
-  yield '}'
-  yield 'export interface PostRequest<TRequest, TResponse> {'
-  yield IncIndent
-  yield 'data: TRequest'
-  yield 'url: string'
-  yield "method: 'POST'"
-  yield DecIndent
-  yield '}'
-  yield 'export interface PatchRequest<TRequest, TResponse> {'
-  yield IncIndent
-  yield 'data: TRequest'
-  yield 'url: string'
-  yield "method: 'PATCH'"
-  yield DecIndent
-  yield '}'
-  yield 'export interface PutRequest<TRequest, TResponse> {'
-  yield IncIndent
-  yield 'data: TRequest'
-  yield 'url: string'
-  yield "method: 'PUT'"
-  yield DecIndent
-  yield '}'
+export function* generateImportRequestTypes(): AsyncDocumentParts {
+  yield "import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf'"
 }
 
 export function* generateQueryHelper(): AsyncDocumentParts {

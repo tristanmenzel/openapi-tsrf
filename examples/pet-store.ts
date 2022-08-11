@@ -1,31 +1,5 @@
 /* eslint-disable */
-export interface GetRequest<TResponse> {
-  url: string
-  method: 'GET'
-}
-export interface OptionsRequest<TResponse> {
-  url: string
-  method: 'OPTIONS'
-}
-export interface DeleteRequest<TResponse> {
-  url: string
-  method: 'DELETE'
-}
-export interface PostRequest<TRequest, TResponse> {
-  data: TRequest
-  url: string
-  method: 'POST'
-}
-export interface PatchRequest<TRequest, TResponse> {
-  data: TRequest
-  url: string
-  method: 'PATCH'
-}
-export interface PutRequest<TRequest, TResponse> {
-  data: TRequest
-  url: string
-  method: 'PUT'
-}
+import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf'
 export const toQuery = (o: {[key: string]: any}): string => {
   const q = Object.keys(o)
     .map(k => ({k, v: o[k]}))
