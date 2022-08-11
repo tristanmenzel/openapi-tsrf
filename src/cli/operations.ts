@@ -44,6 +44,7 @@ export function* generateOperation(
   // Request body type
   if (requestFormat === 'json' && requestBodyType) yield `${requestBodyType}, `
   if (requestFormat === 'form') yield 'FormData, '
+  if (requestFormat === 'empty') yield 'undefined, '
   // Response body type
   yield responseBodyType
 
@@ -99,7 +100,10 @@ export function* generateOperation(
     return queryPattern ? `\`${path}${queryPattern}\`` : `'${path}'`
   }
 
-  function getRequestBodyType(): ['json' | 'form' | 'na', string | undefined] {
+  function getRequestBodyType(): [
+    'json' | 'form' | 'na' | 'empty',
+    string | undefined,
+  ] {
     switch (method) {
       case 'put':
       case 'post':
@@ -126,7 +130,7 @@ export function* generateOperation(
             ),
           ]
         } else {
-          return ['na', undefined]
+          return ['empty', undefined]
         }
     }
     return ['na', undefined]
