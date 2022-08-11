@@ -2,12 +2,7 @@
   "name": "openapi-tsrf",
   "version": "0.5.5",
   "description": "Generates request factories for all discovered operations in an open api 3 document",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "repository": "https://github.com/tristanmenzel/openapi-tsrf.git",
-  "bin": {
-    "openapi-tsrf": "bin/openapi-tsrf.js"
-  },
   "scripts": {
     "check-types": "tsc",
     "build": "run-s build:*",
