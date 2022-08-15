@@ -57,19 +57,25 @@ export function* getSchemaDefinition(
     }
     if (schema3Checker.hasProp(schema, 'oneOf')) {
       yield IncIndent
+      if (schema.oneOf.length > 1) yield '('
       yield* yieldMap(schema.oneOf, getSchemaDefinition, [NewLine, '| '])
+      if (schema.oneOf.length > 1) yield ')'
       yield DecIndent
       return
     }
     if (schema3Checker.hasProp(schema, 'allOf')) {
       yield IncIndent
+      if (schema.allOf.length > 1) yield '('
       yield* yieldMap(schema.allOf, getSchemaDefinition, [NewLine, '& '])
+      if (schema.allOf.length > 1) yield ')'
       yield DecIndent
       return
     }
     if (schema3Checker.hasProp(schema, 'anyOf')) {
       yield IncIndent
+      if (schema.anyOf.length > 1) yield '('
       yield* yieldMap(schema.anyOf, getSchemaDefinition, [NewLine, '| '])
+      if (schema.anyOf.length > 1) yield ')'
       yield DecIndent
       return
     }

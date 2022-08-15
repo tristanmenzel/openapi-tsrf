@@ -1,0 +1,75 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "1.0.0",
+    "title": ""
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "Shape": {
+        "allOf": [
+          {
+            "type": "object",
+            "required": ["color"],
+            "properties": {
+              "color": {
+                "type": "string",
+                "enum": ["black", "blue", "red"]
+              }
+            }
+          },
+          {
+            "anyOf": [
+              {
+                "type": "object",
+                "required": ["type", "size"],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["square"]
+                  },
+                  "size": {
+                    "type": "number"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["type", "radius"],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["circle"]
+                  },
+                  "radius": {
+                    "type": "number"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["type", "opposite", "adjacent", "hypotenuse"],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["triangle"]
+                  },
+                  "opposite": {
+                    "type": "number"
+                  },
+                  "adjacent": {
+                    "type": "number"
+                  },
+                  "hypotenuse": {
+                    "type": "number"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

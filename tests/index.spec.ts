@@ -46,4 +46,7 @@ describe('Test examples', () => {
   it('nullable', () => {
     testExample('nullable', writeActuals)
   })
+  it('nested-any-of-all-of', () => {
+    testExample('nested-any-of-all-of', writeActuals)
+  })
 })
