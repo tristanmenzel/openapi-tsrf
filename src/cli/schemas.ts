@@ -79,6 +79,18 @@ export function* getSchemaDefinition(
       yield DecIndent
       return
     }
+    if (schema.enum) {
+      yield IncIndent
+      yield* yieldMap(
+        schema.enum,
+        function* (value) {
+          yield typeof value === 'string' ? `'${value}'` : `${value}`
+        },
+        [NewLine, '| '],
+      )
+      yield DecIndent
+      return
+    }
     switch (schema.type) {
       case 'integer':
       case 'number':
@@ -88,18 +100,6 @@ export function* getSchemaDefinition(
         yield 'boolean'
         return
       case 'string':
-        if (schema.enum) {
-          yield IncIndent
-          yield* yieldMap(
-            schema.enum,
-            function* (value) {
-              yield typeof value === 'string' ? `'${value}'` : `${value}`
-            },
-            [NewLine, '| '],
-          )
-          yield DecIndent
-          return
-        }
         if (schema.format === 'binary') {
           yield 'File'
           return

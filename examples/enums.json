@@ -1,0 +1,30 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "1.0.0",
+    "title": ""
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "Enums": {
+        "additionalProperties": false,
+        "properties": {
+          "string": {
+            "type": "string",
+            "enum": ["a", "b", "c"]
+          },
+          "number": {
+            "type": "number",
+            "enum": [1, 2, 3]
+          },
+          "boolean": {
+            "type": "boolean",
+            "enum": [true, false]
+          }
+        },
+        "type": "object"
+      }
+    }
+  }
+}

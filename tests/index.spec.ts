@@ -49,4 +49,7 @@ describe('Test examples', () => {
   it('nested-any-of-all-of', () => {
     testExample('nested-any-of-all-of', writeActuals)
   })
+  it('enums', () => {
+    testExample('enums', writeActuals)
+  })
 })
