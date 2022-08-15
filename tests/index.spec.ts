@@ -43,4 +43,7 @@ describe('Test examples', () => {
   it('Users form data', () => {
     testExample('users-form-data', writeActuals)
   })
+  it('nullable', () => {
+    testExample('nullable', writeActuals)
+  })
 })

@@ -1,0 +1,52 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "1.0.0",
+    "title": ""
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "Address": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "line1": {
+            "type": "string"
+          },
+          "line2": {
+            "nullable": true,
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "zip": {
+            "type": "string"
+          }
+        },
+        "required": ["line1", "line2", "city", "state", "zip", "country"],
+        "type": "object"
+      },
+      "User": {
+        "type": "object",
+        "required": ["address"],
+        "properties": {
+          "address": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ],
+            "nullable": true
+          }
+        }
+      }
+    }
+  }
+}

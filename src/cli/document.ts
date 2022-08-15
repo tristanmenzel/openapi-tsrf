@@ -9,21 +9,28 @@ import { generateOperation } from './operations'
 export function* generateDocumentParts(
   document: Swagger.Spec3,
 ): AsyncDocumentParts {
-  yield "import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf-runtime'"
-  yield "import { toQuery, toFormData } from 'openapi-tsrf-runtime'"
+  const hasOperations =
+    iterateDictionary(document.paths).flatMap(([_, pathObj]) =>
+      methods(pathObj).map(([_, operation]) => operation),
+    ).length > 0
+  if (hasOperations) {
+    yield "import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf-runtime'"
+    yield "import { toQuery, toFormData } from 'openapi-tsrf-runtime'"
+  }
   for (const [name, schemaObj] of iterateDictionary(
     document.components.schemas,
   )) {
     yield* generateSchema(name, schemaObj)
   }
-
-  yield 'export abstract class RequestFactory {'
-  yield IncIndent
-  for (const [pathStr, pathObj] of iterateDictionary(document.paths)) {
-    for (const [method, operation] of methods(pathObj)) {
-      yield* generateOperation(pathStr, method, operation)
+  if (hasOperations) {
+    yield 'export abstract class RequestFactory {'
+    yield IncIndent
+    for (const [pathStr, pathObj] of iterateDictionary(document.paths)) {
+      for (const [method, operation] of methods(pathObj)) {
+        yield* generateOperation(pathStr, method, operation)
+      }
     }
+    yield DecIndent
+    yield '}'
   }
-  yield DecIndent
-  yield '}'
 }

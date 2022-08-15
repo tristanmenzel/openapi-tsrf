@@ -1,5 +1,7 @@
 import type { Swagger } from './swagger'
 import type { HttpMethod } from './definitions'
+import type { Part } from './output'
+import type { AsyncDocumentParts } from './output'
 
 export function methods(
   path: Swagger.Path3,
@@ -30,9 +32,17 @@ export function iterateDictionary<T extends { [key: string]: any }>(
 
 export function* yieldMap<TSource, TResult>(
   source: TSource[],
-  map: (source: TSource) => TResult,
-): Generator<TResult> {
+  map: (source: TSource) => AsyncDocumentParts,
+  join: Part[] = [],
+): AsyncDocumentParts {
+  let first = true
   for (const val of source) {
-    yield map(val)
+    if (!first) yield* generatorFromParts(join)
+    yield* map(val)
+    first = false
   }
+}
+
+function* generatorFromParts(parts: Part[]): AsyncDocumentParts {
+  for (const part of parts) yield part
 }

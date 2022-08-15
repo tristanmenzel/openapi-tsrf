@@ -1,13 +1,13 @@
 /* eslint-disable */
 import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf-runtime'
 import { toQuery, toFormData } from 'openapi-tsrf-runtime'
-export interface Pet {
+export type Pet = {
   id: number
   name: string
   tag?: string
 }
 export type Pets = Array<Pet>
-export interface Error {
+export type Error = {
   code: number
   message: string
 }

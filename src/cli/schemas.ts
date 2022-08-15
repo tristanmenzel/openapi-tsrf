@@ -1,68 +1,28 @@
 import { iterateDictionary, yieldMap } from './iteration-helpers'
 import type { Swagger } from './swagger'
 import type { AsyncDocumentParts } from './output'
-import { DecIndent, IncIndent } from './output'
+import {
+  DecIndent,
+  IncIndent,
+  InlineMode,
+  NewLine,
+  NewLineMode,
+  PropertyDelimiter,
+  RestoreLineMode,
+} from './output'
 import { makeSafeTypeIdentifier } from './sanitization'
+import { typeCheckerFor } from './util'
 
 export function* generateSchema(
   name: string,
   schema: Swagger.Schema3,
 ): AsyncDocumentParts {
   const safeName = makeSafeTypeIdentifier(name)
-  if (schema.oneOf) {
-    yield `export type ${safeName} =`
-    yield IncIndent
-    yield* yieldMap(schema.oneOf, subSchema => `| ${getTypeName(subSchema)}`)
-    yield DecIndent
-    return
-  }
-  if (schema.allOf) {
-    yield `export type ${safeName} =`
-    yield IncIndent
-    yield* yieldMap(schema.allOf, subSchema => `& ${getTypeName(subSchema)}`)
-    yield DecIndent
-    return
-  }
-  if (schema.anyOf) {
-    yield `export type ${safeName} =`
-    yield IncIndent
-    yield* yieldMap(
-      schema.anyOf,
-      subSchema => `& Partial<${getTypeName(subSchema)}>`,
-    )
-    yield DecIndent
-    return
-  }
 
-  if (schema.$ref) {
-    yield `export type ${safeName} = ${getSchemaNameFromRef(schema.$ref)}`
-    return
-  }
-
-  switch (schema.type) {
-    case 'object':
-      yield `export interface ${safeName} {`
-      yield IncIndent
-      for (const [propName, propDef] of iterateDictionary(schema.properties)) {
-        yield `${propName}${
-          schema.required?.includes(propName) ? '' : '?'
-        }: ${getTypeName(propDef)}`
-      }
-      yield DecIndent
-      yield '}'
-      break
-    case 'array':
-    case 'number':
-    case 'integer':
-    case 'boolean':
-    case 'string':
-      yield `export type ${safeName} = ${getTypeName(schema)}`
-      break
-    default:
-      throw new Error(
-        `Unsupported schema: ${name} \n${JSON.stringify(schema, undefined, 2)}`,
-      )
-  }
+  yield InlineMode
+  yield `export type ${safeName} = `
+  yield* getSchemaDefinition(schema)
+  yield NewLineMode
 }
 
 function getSchemaNameFromRef($ref: string) {
@@ -72,42 +32,110 @@ function getSchemaNameFromRef($ref: string) {
   return makeSafeTypeIdentifier($ref.substring(schemaPath.length))
 }
 
-export function getTypeName(
+export function* getSchemaDefinition(
   schema: Swagger.Schema3 | Swagger.BaseSchema | undefined,
-): string {
-  if (schema === undefined) return 'unknown'
-  if (schema.$ref) {
-    return getSchemaNameFromRef(schema.$ref)
-  }
-  switch (schema.type) {
-    case 'integer':
-    case 'number':
-      return 'number'
-    case 'boolean':
-      return 'boolean'
-    case 'string':
-      if (schema.enum) {
-        return schema.enum
-          .map(x => (typeof x === 'string' ? `'${x}'` : x))
-          .join(' | ')
+): AsyncDocumentParts {
+  const schema3Checker = typeCheckerFor<Swagger.Schema3>()
+  try {
+    yield InlineMode
+    if (schema === undefined) {
+      yield 'unknown'
+      return
+    }
+    if (schema3Checker.hasProp(schema, 'nullable')) {
+      const { nullable, ...rest } = schema
+      if (nullable) {
+        yield 'null | '
+        yield* getSchemaDefinition(rest)
+        return
       }
-      if (schema.format === 'binary') return 'File'
-      return 'string'
-    case 'array':
-      return `Array<${getTypeName(schema.items)}>`
-    case 'object':
-      const objSchema = schema as Swagger.Schema3
-      return `{${iterateDictionary(objSchema.properties)
-        .map(
-          ([propName, propDef]) =>
-            `${propName}${
-              objSchema.required?.includes(propName) ? '' : '?'
-            }: ${getTypeName(propDef)}`,
-        )
-        .join(', ')}}`
-    default:
-      throw new Error(
-        `Unsupported schema: ${JSON.stringify(schema, undefined, 2)}`,
+    }
+
+    if (schema.$ref) {
+      yield getSchemaNameFromRef(schema.$ref)
+      return
+    }
+    if (schema3Checker.hasProp(schema, 'oneOf')) {
+      yield IncIndent
+      yield* yieldMap(schema.oneOf, getSchemaDefinition, [NewLine, '| '])
+      yield DecIndent
+      return
+    }
+    if (schema3Checker.hasProp(schema, 'allOf')) {
+      yield IncIndent
+      yield* yieldMap(schema.allOf, getSchemaDefinition, [NewLine, '& '])
+      yield DecIndent
+      return
+    }
+    if (schema3Checker.hasProp(schema, 'anyOf')) {
+      yield IncIndent
+      yield* yieldMap(
+        schema.anyOf,
+        function* (subSchema) {
+          yield 'Partial<'
+          yield* getSchemaDefinition(subSchema)
+          yield '>'
+        },
+        [NewLine, '& '],
       )
+      yield DecIndent
+      return
+    }
+    switch (schema.type) {
+      case 'integer':
+      case 'number':
+        yield 'number'
+        return
+      case 'boolean':
+        yield 'boolean'
+        return
+      case 'string':
+        if (schema.enum) {
+          yield IncIndent
+          yield* yieldMap(
+            schema.enum,
+            function* (value) {
+              yield typeof value === 'string' ? `'${value}'` : `${value}`
+            },
+            [NewLine, '| '],
+          )
+          yield DecIndent
+          return
+        }
+        if (schema.format === 'binary') {
+          yield 'File'
+          return
+        }
+        yield 'string'
+        return
+      case 'array':
+        yield 'Array<'
+        yield* getSchemaDefinition(schema.items)
+        yield '>'
+        return
+      case 'object':
+        const objSchema = schema as Swagger.Schema3
+        yield '{'
+        yield NewLine
+        yield IncIndent
+        for (const [propName, propDef] of iterateDictionary(
+          objSchema.properties,
+        )) {
+          yield propName
+          if (!objSchema.required?.includes(propName)) yield '?'
+          yield ': '
+          yield* getSchemaDefinition(propDef)
+          yield PropertyDelimiter
+        }
+        yield DecIndent
+        yield '}'
+        return
+      default:
+        throw new Error(
+          `Unsupported schema: ${JSON.stringify(schema, undefined, 2)}`,
+        )
+    }
+  } finally {
+    yield RestoreLineMode
   }
 }

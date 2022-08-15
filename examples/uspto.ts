@@ -1,9 +1,14 @@
 /* eslint-disable */
 import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf-runtime'
 import { toQuery, toFormData } from 'openapi-tsrf-runtime'
-export interface dataSetList {
+export type dataSetList = {
   total?: number
-  apis?: Array<{apiKey?: string, apiVersionNumber?: string, apiUrl?: string, apiDocumentationUrl?: string}>
+  apis?: Array<{
+    apiKey?: string
+    apiVersionNumber?: string
+    apiUrl?: string
+    apiDocumentationUrl?: string
+  }>
 }
 export abstract class RequestFactory {
   static listDataSets(): GetRequest<dataSetList> {
@@ -18,7 +23,7 @@ export abstract class RequestFactory {
       url: `/${dataset}/${version}/fields`,
     }
   }
-  static performSearch({ body, version, dataset, }: { body: {criteria: string, start?: number, rows?: number}, version: string, dataset: string, }): PostRequest<{criteria: string, start?: number, rows?: number}, Array<{}>> {
+  static performSearch({ body, version, dataset, }: { body: { criteria: string, start?: number, rows?: number, }, version: string, dataset: string, }): PostRequest<{ criteria: string, start?: number, rows?: number, }, Array<{ }>> {
     return {
       method: 'POST',
       url: `/${dataset}/${version}/records`,

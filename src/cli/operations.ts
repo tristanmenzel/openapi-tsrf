@@ -3,8 +3,14 @@ import type { Swagger } from './swagger'
 import { iterateDictionary } from './iteration-helpers'
 
 import type { AsyncDocumentParts } from './output'
-import { DecIndent, IncIndent, InlineMode, NewLineMode } from './output'
-import { getTypeName } from './schemas'
+import {
+  DecIndent,
+  IncIndent,
+  InlineMode,
+  NewLineMode,
+  formatInline,
+} from './output'
+import { getSchemaDefinition } from './schemas'
 import { makeSafeMethodIdentifier } from './sanitization'
 
 export function* generateOperation(
@@ -86,8 +92,8 @@ export function* generateOperation(
       yield param.name
       if (!param.required) yield '?'
       yield ': '
-      if (param.type) yield getTypeName(param)
-      else yield getTypeName(param.schema)
+      if (param.type) yield* getSchemaDefinition(param)
+      else yield* getSchemaDefinition(param.schema)
       yield ', '
     }
     yield '}'
@@ -113,21 +119,27 @@ export function* generateOperation(
           if (operation.requestBody.content['multipart/form-data'])
             return [
               'form',
-              getTypeName(
-                operation.requestBody.content['multipart/form-data'].schema,
+              formatInline(
+                getSchemaDefinition(
+                  operation.requestBody.content['multipart/form-data'].schema,
+                ),
               ),
             ]
           return [
             'json',
-            getTypeName(
-              operation.requestBody.content?.['application/json']?.schema,
+            formatInline(
+              getSchemaDefinition(
+                operation.requestBody.content?.['application/json']?.schema,
+              ),
             ),
           ]
         } else if (operation.parameters?.some(p => p.in === 'body')) {
           return [
             'json',
-            getTypeName(
-              operation.parameters?.find(p => p.in === 'body')?.schema,
+            formatInline(
+              getSchemaDefinition(
+                operation.parameters?.find(p => p.in === 'body')?.schema,
+              ),
             ),
           ]
         } else {
@@ -158,6 +170,8 @@ export function* generateOperation(
         return 'Blob'
       }
     }
-    return getTypeName(response.content['application/json'].schema)
+    return formatInline(
+      getSchemaDefinition(response.content['application/json'].schema),
+    )
   }
 }

@@ -1,14 +1,15 @@
 /* eslint-disable */
 import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf-runtime'
 import { toQuery, toFormData } from 'openapi-tsrf-runtime'
-export interface User {
+export type User = {
   id: number
   email: string
   name: string
-  status?: 'Happy' | 'Sad'
+  status?: 'Happy'
+    | 'Sad'
   phoneNumbers: Array<string>
 }
-export interface Pick_User_email_or_name_or_phoneNumbers_ {
+export type Pick_User_email_or_name_or_phoneNumbers_ = {
   email: string
   name: string
   phoneNumbers: Array<string>
@@ -35,7 +36,7 @@ export abstract class RequestFactory {
       url: `/users/${userId}/avatar`,
     }
   }
-  static postAvatar({ body, userId, }: { body: {title: string, file: File}, userId: number, }): PostRequest<FormData, undefined> {
+  static postAvatar({ body, userId, }: { body: { title: string, file: File, }, userId: number, }): PostRequest<FormData, undefined> {
     const formData = toFormData(body)
     return {
       method: 'POST',
