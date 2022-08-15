@@ -69,15 +69,7 @@ export function* getSchemaDefinition(
     }
     if (schema3Checker.hasProp(schema, 'anyOf')) {
       yield IncIndent
-      yield* yieldMap(
-        schema.anyOf,
-        function* (subSchema) {
-          yield 'Partial<'
-          yield* getSchemaDefinition(subSchema)
-          yield '>'
-        },
-        [NewLine, '& '],
-      )
+      yield* yieldMap(schema.anyOf, getSchemaDefinition, [NewLine, '| '])
       yield DecIndent
       return
     }
