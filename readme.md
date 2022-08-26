@@ -63,7 +63,7 @@ const pets = await makeRequest(RequestFactory.listPets())
 const specificPet = await makeRequest(RequestFactory.showPetById(123))
 ```
 
-What if we didn't need to do this? This is where the `ApiRequestFactory` comes in hand. This factory allows you to wrap a request factory in a Javascript Proxy type which automatically dispatches requests for you based on the logic you define and returns the result of the operation to the caller. You can even pass in additional config to the proxy before invoking an operation. 
+What if we didn't need to do this? This is where the `ApiProxyFactory` comes in hand. This factory allows you to wrap a request factory in a Javascript Proxy type which automatically dispatches requests for you based on the logic you define and returns the result of the operation to the caller. You can even pass in additional config to the proxy before invoking an operation. 
 
 ```ts
 
