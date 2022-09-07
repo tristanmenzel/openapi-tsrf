@@ -67,8 +67,8 @@ What if we didn't need to do this? This is where the `ApiProxyFactory` comes in 
 
 ```ts
 
-import type { AnyRequest } from 'openapi-tsrf'
-import { ApiProxyFactory } from 'openapi-tsrf'
+import type { AnyRequest } from 'openapi-tsrf-runtime'
+import { ApiProxyFactory } from 'openapi-tsrf-runtime'
 import { RequestFactory } from './examples/pet-store'
 
 interface RequestConfig {
