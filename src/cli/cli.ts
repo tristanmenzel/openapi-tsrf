@@ -29,6 +29,7 @@ program
         console.error(
           '"--openapi" must be present and point to a valid openapi file.',
         )
+        return
       }
 
       const openapiDoc = JSON.parse(fs.readFileSync(options.openapi, 'utf-8'))
