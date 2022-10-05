@@ -91,6 +91,9 @@ export function* getSchemaDefinition(
       yield DecIndent
       return
     }
+
+    if (schemaLooksLikeImplicitObjectType(schema)) schema.type = 'object'
+
     switch (schema.type) {
       case 'integer':
       case 'number':
@@ -136,4 +139,20 @@ export function* getSchemaDefinition(
   } finally {
     yield RestoreLineMode
   }
+}
+
+/**
+ * Some schemas don't explicitly set type=object, but if they list a set of properties then
+ * we should treat them as an object schema
+ * @param schema
+ */
+function schemaLooksLikeImplicitObjectType(
+  schema: Swagger.Schema3 | Swagger.BaseSchema,
+) {
+  const maybeObjSchema = schema as Swagger.Schema3
+  return (
+    schema.type === undefined &&
+    maybeObjSchema.properties !== undefined &&
+    Object.keys(maybeObjSchema.properties).length > 0
+  )
 }
