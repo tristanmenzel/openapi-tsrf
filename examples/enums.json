@@ -22,8 +22,7 @@
             "type": "boolean",
             "enum": [true, false]
           }
-        },
-        "type": "object"
+        }
       }
     }
   }
