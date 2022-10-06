@@ -1,6 +1,6 @@
 {
   "name": "openapi-tsrf",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Generates request factories for all discovered operations in an open api 3 document",
   "repository": "https://github.com/tristanmenzel/openapi-tsrf.git",
   "scripts": {
@@ -11,9 +11,10 @@
     "build:2-build-runtime": "tsc -p tsconfig.runtime.json",
     "build:3-copy-pkg-json": "node ./scripts/copy-package-json.js",
     "build:4-copy-bin": "copyfiles bin/* dist/cli -f",
+    "lint": "eslint ./src/ --ext .ts",
+    "lint:fix": "eslint ./src/ --ext .ts --fix",
     "test": "jest",
-    "test:ci": "TEST_ENV=ci jest",
-    "lint": "eslint src/**"
+    "test:ci": "TEST_ENV=ci jest"
   },
   "author": "Tristan Menzel",
   "license": "MIT",

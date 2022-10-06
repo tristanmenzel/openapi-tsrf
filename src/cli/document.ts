@@ -5,6 +5,7 @@ import { DecIndent, IncIndent } from './output'
 import { iterateDictionary, methods } from './iteration-helpers'
 import { generateSchema } from './schemas'
 import { generateOperation } from './operations'
+import { notFalsy } from './util'
 
 export function* generateDocumentParts(
   document: Swagger.Spec3,
@@ -27,10 +28,37 @@ export function* generateDocumentParts(
     yield IncIndent
     for (const [pathStr, pathObj] of iterateDictionary(document.paths)) {
       for (const [method, operation] of methods(pathObj)) {
-        yield* generateOperation(pathStr, method, operation)
+        yield* generateOperation(
+          pathStr,
+          method,
+          inlineRefParameters(document, operation),
+        )
       }
     }
     yield DecIndent
     yield '}'
   }
+}
+
+function inlineRefParameters(
+  document: Swagger.Spec3,
+  operation: Swagger.Operation3,
+): Swagger.Operation3 {
+  return {
+    ...operation,
+    parameters: operation.parameters
+      ?.map(p =>
+        p.$ref
+          ? document.components?.parameters?.[getParameterNameFromRef(p.$ref)]
+          : p,
+      )
+      .filter(notFalsy),
+  }
+}
+
+function getParameterNameFromRef($ref: string) {
+  const parameterPath = '#/components/parameters/'
+  if (!$ref.startsWith(parameterPath))
+    throw new Error(`Unsupported: $refs must start with ${parameterPath}`)
+  return $ref.substring(parameterPath.length)
 }

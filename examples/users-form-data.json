@@ -1,210 +1,195 @@
 {
-	"components": {
-		"schemas": {
-			"User": {
-				"properties": {
-					"id": {
-						"type": "number",
-						"format": "double"
-					},
-					"email": {
-						"type": "string"
-					},
-					"name": {
-						"type": "string"
-					},
-					"status": {
-						"type": "string",
-						"enum": [
-							"Happy",
-							"Sad"
-						]
-					},
-					"phoneNumbers": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"id",
-					"email",
-					"name",
-					"phoneNumbers"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Pick_User.email-or-name-or-phoneNumbers_": {
-				"properties": {
-					"email": {
-						"type": "string"
-					},
-					"name": {
-						"type": "string"
-					},
-					"phoneNumbers": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"email",
-					"name",
-					"phoneNumbers"
-				],
-				"type": "object",
-				"description": "From T, pick a set of properties whose keys are in the union K"
-			},
-			"UserCreationParams": {
-				"$ref": "#/components/schemas/Pick_User.email-or-name-or-phoneNumbers_"
-			}
-		}
-	},
-	"info": {
-		"title": "tsoa",
-		"version": "1.0.0",
-		"license": {
-			"name": "ISC"
-		},
-		"contact": {}
-	},
-	"openapi": "3.0.0",
-	"paths": {
-		"/users/{userId}": {
-			"get": {
-				"operationId": "GetUser",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/User"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "userId",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "query",
-						"name": "name",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/users": {
-			"post": {
-				"operationId": "CreateUser",
-				"responses": {
-					"201": {
-						"description": "Created"
-					}
-				},
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/UserCreationParams"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/users/{userId}/avatar": {
-			"post": {
-				"operationId": "PostAvatar",
-				"responses": {
-					"202": {
-						"description": "Accepted"
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "userId",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"multipart/form-data": {
-							"schema": {
-								"type": "object",
-								"properties": {
-									"title": {
-										"type": "string"
-									},
-									"file": {
-										"type": "string",
-										"format": "binary"
-									}
-								},
-								"required": [
-									"title",
-									"file"
-								]
-							}
-						}
-					}
-				}
-			},
-			"get": {
-				"operationId": "GetAvatar",
-				"responses": {
-					"200": {
-						"description": "Success",
-						"content": {
-							"image/jpg": {
-								"schema": {
-									"type": "string",
-									"format": "byte"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "userId",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		}
-	}
+  "components": {
+    "schemas": {
+      "User": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["Happy", "Sad"]
+          },
+          "phoneNumbers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["id", "email", "name", "phoneNumbers"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Pick_User.email-or-name-or-phoneNumbers_": {
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phoneNumbers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["email", "name", "phoneNumbers"],
+        "type": "object",
+        "description": "From T, pick a set of properties whose keys are in the union K"
+      },
+      "UserCreationParams": {
+        "$ref": "#/components/schemas/Pick_User.email-or-name-or-phoneNumbers_"
+      }
+    }
+  },
+  "info": {
+    "title": "tsoa",
+    "version": "1.0.0",
+    "license": {
+      "name": "ISC"
+    },
+    "contact": {}
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/users/{userId}": {
+      "get": {
+        "operationId": "GetUser",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/users": {
+      "post": {
+        "operationId": "CreateUser",
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreationParams"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{userId}/avatar": {
+      "post": {
+        "operationId": "PostAvatar",
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": ["title", "file"]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "GetAvatar",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "image/jpg": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    }
+  }
 }
