@@ -92,7 +92,12 @@ export function* getSchemaDefinition(
       return
     }
 
-    if (schemaLooksLikeImplicitObjectType(schema)) schema.type = 'object'
+    if (schemaLooksLikeImplicitObjectType(schema)) {
+      schema = {
+        ...schema,
+        type: 'object',
+      }
+    }
 
     switch (schema.type) {
       case 'integer':
