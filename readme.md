@@ -122,6 +122,22 @@ const pets = await PetStoreApi.listPets({ credentials: 'omit' }, { limit: 5 })
 
 ```
 
+You can also specify default values for your config when creating a proxy.
+
+```ts
+interface MyConfig {
+  baseUrl: string
+  timeout: number
+}
+
+// create factory as per above
+
+const PetStoreApi = factory.createProxy(RequestFactory, { baseUrl: '', timeout: 30 })
+
+PetStoreApi.listPets.withConfig({ timeout: 60 }).execute({limit: 100})
+
+```
+
 ## Requirements / Limitations
 
  - All operations must have a unique operationId set as this is used for the name of the RequestFactory method

@@ -37,24 +37,44 @@ export type MakeRequest<TConfig> = <TResponse>(
   config: TConfig | undefined,
 ) => Promise<TResponse>
 
+export type NotDefaultedConfig<
+  TConfig,
+  TDefaultedConfig extends Partial<TConfig>,
+> = Partial<TDefaultedConfig> &
+  Omit<TConfig, keyof TDefaultedConfig> extends infer O
+  ? { [key in keyof O]: O[key] }
+  : never
+
 export class ApiProxyFactory<TConfig = never> {
   constructor(private makeRequest: MakeRequest<TConfig>) {}
 
-  createProxy<TRequestFactory extends object>(
+  createProxy<
+    TRequestFactory extends object,
+    TConfigDefaults extends Partial<TConfig>,
+  >(
     requestFactory: TRequestFactory,
-  ): ProxyFor<TRequestFactory, TConfig> {
-    return this.createProxyInternal(requestFactory, false)
+    defaultConfig?: TConfigDefaults,
+  ): ProxyFor<TRequestFactory, NotDefaultedConfig<TConfig, TConfigDefaults>> {
+    return this.createProxyInternal(requestFactory, false, defaultConfig)
   }
 
-  createProxyWithRequiredConfig<TRequestFactory extends object>(
+  createProxyWithRequiredConfig<
+    TRequestFactory extends object,
+    TConfigDefaults extends Partial<TConfig>,
+  >(
     requestFactory: TRequestFactory,
-  ): ProxyForWithRequiredConfig<TRequestFactory, TConfig> {
-    return this.createProxyInternal(requestFactory, true)
+    defaultConfig?: TConfig,
+  ): ProxyForWithRequiredConfig<
+    TRequestFactory,
+    NotDefaultedConfig<TConfig, TConfigDefaults>
+  > {
+    return this.createProxyInternal(requestFactory, true, defaultConfig)
   }
 
   private createProxyInternal<TRequestFactory extends object>(
     requestFactory: TRequestFactory,
     firstArgIsConfig: boolean,
+    defaultConfig?: Partial<TConfig>,
   ) {
     const factory = this
 
@@ -81,11 +101,10 @@ export class ApiProxyFactory<TConfig = never> {
             const request = requestFactory(...args)
 
             try {
-              if (firstArgIsConfig) {
-                return factory.makeRequest(request, config)
-              } else {
-                return (factory.makeRequest as any)(request, config)
-              }
+              return factory.makeRequest(
+                request,
+                defaultConfig ? { ...defaultConfig, ...config } : config,
+              )
             } catch (error: unknown) {
               console.error('Api error', error)
               throw error

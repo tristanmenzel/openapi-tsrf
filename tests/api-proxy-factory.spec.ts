@@ -67,6 +67,46 @@ describe('ApiProxyFactory', () => {
       })
     })
   })
+  describe('With default config', () => {
+    type MyConfig = {
+      value: string
+      otherValue: number
+    }
+
+    const myMockRequester = jest.fn(
+      (request: AnyRequest<any>, config: MyConfig | undefined): any =>
+        Promise.resolve(request),
+    )
+    const myProxyFactory = new ApiProxyFactory<MyConfig>(myMockRequester)
+    const myApi = myProxyFactory.createProxy(RequestFactory, {
+      value: 'Default',
+      otherValue: 1,
+    })
+    beforeEach(() => {
+      myMockRequester.mockClear()
+    })
+    it('Passes default config to makeRequest when no config provided', async () => {
+      await myApi.getThings(1, 'b', false)
+
+      expect(myMockRequester).toHaveBeenCalledTimes(1)
+      expect(myMockRequester).toHaveBeenCalledWith(expect.anything(), {
+        value: 'Default',
+        otherValue: 1,
+      })
+    })
+
+    it('Merges config to makeRequest when it is present', async () => {
+      await myApi.getThings
+        .withConfig({ value: 'abc123' })
+        .execute(1, 'b', false)
+
+      expect(myMockRequester).toHaveBeenCalledTimes(1)
+      expect(myMockRequester).toHaveBeenCalledWith(expect.anything(), {
+        value: 'abc123',
+        otherValue: 1,
+      })
+    })
+  })
   describe('With required config', () => {
     type MyConfig = {
       jwt: string
