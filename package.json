@@ -1,6 +1,6 @@
 {
   "name": "openapi-tsrf",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Generates request factories for all discovered operations in an open api 3 document",
   "repository": "https://github.com/tristanmenzel/openapi-tsrf.git",
   "scripts": {
@@ -20,6 +20,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^28.1.6",
+    "@types/js-yaml": "^4.0.5",
     "@typescript-eslint/eslint-plugin": "^5.33.0",
     "@typescript-eslint/parser": "^5.33.0",
     "copyfiles": "^2.4.1",
@@ -36,6 +37,7 @@
     "@types/node": "^18.6.5",
     "change-case": "^4.1.2",
     "commander": "^9.4.0",
-    "esm": "^3.2.25"
+    "esm": "^3.2.25",
+    "js-yaml": "^4.1.0"
   }
 }
