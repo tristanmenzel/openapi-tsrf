@@ -136,6 +136,9 @@ export function* getSchemaDefinition(
         yield DecIndent
         yield '}'
         return
+      case undefined:
+        yield '{ /* empty object */ [key in never]: never }'
+        return
       default:
         throw new Error(
           `Unsupported schema: ${JSON.stringify(schema, undefined, 2)}`,
