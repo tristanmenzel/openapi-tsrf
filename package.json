@@ -1,6 +1,6 @@
 {
   "name": "openapi-tsrf",
-  "version": "0.12.0",
+  "version": "0.0.0",
   "description": "Generates request factories for all discovered operations in an open api 3 document",
   "repository": "https://github.com/tristanmenzel/openapi-tsrf.git",
   "scripts": {
