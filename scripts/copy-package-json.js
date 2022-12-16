@@ -14,7 +14,7 @@ const mainPkgJson = readJson('../package.json')
 const cliPkgJson = readJson('../package.cli.json')
 const runtimePkgJson = readJson('../package.runtime.json')
 
-const { version, dependencies } = mainPkgJson
+const { dependencies } = mainPkgJson
 
-writeJson('../dist/cli/package.json', { ...cliPkgJson, version, dependencies })
-writeJson('../dist/runtime/package.json', { ...runtimePkgJson, version })
+writeJson('../dist/cli/package.json', { ...cliPkgJson, dependencies })
+writeJson('../dist/runtime/package.json', { ...runtimePkgJson })

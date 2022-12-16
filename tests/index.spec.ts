@@ -6,9 +6,13 @@ import * as fs from 'fs'
 const writeActuals = process.env.TEST_ENV !== 'ci'
 
 describe('Test examples', () => {
-  function testExample(exampleName: string, writeActual: boolean) {
+  function testExample(
+    exampleName: string,
+    writeActual: boolean,
+    ext: string = 'json',
+  ) {
     const openApiDoc = loadOpenApi3(
-      path.join(__dirname, `../examples/${exampleName}.json`),
+      path.join(__dirname, `../examples/${exampleName}.${ext}`),
     )
 
     const result = writeDocumentPartsToString(
@@ -51,5 +55,8 @@ describe('Test examples', () => {
   })
   it('enums', () => {
     testExample('enums', writeActuals)
+  })
+  it('yaml file', () => {
+    testExample('uspto-yaml', writeActuals, 'yaml')
   })
 })
