@@ -1,6 +1,7 @@
 import { Command } from 'commander'
 import * as fs from 'fs'
 import { generateDocumentParts, writeDocumentPartsToStream } from './index'
+import { loadOpenApi3 } from './util'
 
 const program = new Command()
 
@@ -32,7 +33,7 @@ program
         return
       }
 
-      const openapiDoc = JSON.parse(fs.readFileSync(options.openapi, 'utf-8'))
+      const openapiDoc = loadOpenApi3(options.openapi)
       const output = generateDocumentParts(openapiDoc)
 
       const file = fs.createWriteStream(options.requestFactory, {
