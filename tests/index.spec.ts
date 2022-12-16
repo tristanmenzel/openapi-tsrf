@@ -59,4 +59,7 @@ describe('Test examples', () => {
   it('yaml file', () => {
     testExample('uspto-yaml', writeActuals, 'yaml')
   })
+  it('empty-schemas', () => {
+    testExample('empty-schemas', writeActuals)
+  })
 })

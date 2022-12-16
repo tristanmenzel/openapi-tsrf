@@ -1,6 +1,6 @@
 {
   "name": "openapi-tsrf-cli",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Generates request factories for all discovered operations in an open api 3 document",
   "main": "index.js",
   "types": "index.d.ts",

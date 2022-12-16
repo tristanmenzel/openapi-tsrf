@@ -1,0 +1,71 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "1.0.0",
+    "title": ""
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "EmptyType": {
+        "description": "I don't have a type"
+      },
+      "Director": {
+        "properties": {
+          "directorAddress": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/address"
+              },
+              {
+                "description": "The legal address of the director"
+              }
+            ]
+          }
+        }
+      },
+      "address": {
+        "type": "object",
+        "required": [
+          "streetName",
+          "streetNumber",
+          "streetType",
+          "state",
+          "city",
+          "postcode",
+          "country"
+        ],
+        "properties": {
+          "unitNumber": {
+            "type": "string",
+            "description": "The unit number for the address"
+          },
+          "streetNumber": {
+            "type": "string",
+            "description": "The addresses street number"
+          },
+          "streetName": {
+            "type": "string",
+            "description": "Name of the street"
+          },
+          "streetType": {
+            "type": "string",
+            "description": "The type of street, e.g court, lane, parade"
+          },
+          "city": {
+            "type": "string",
+            "description": "The city the entity was registered or resides in"
+          },
+          "state": {
+            "type": "string",
+            "description": "The state the trust was registered or resides in"
+          },
+          "postcode": {
+            "type": "string",
+            "description": "The postcode e.g. 2000"
+          }
+        }
+      }
+    }
+  }
+}
