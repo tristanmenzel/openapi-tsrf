@@ -17,7 +17,7 @@ export type Pick_User_email_or_name_or_phoneNumbers_ = {
 export type UserCreationParams = Pick_User_email_or_name_or_phoneNumbers_
 export abstract class RequestFactory {
   static getUser({ userId, name, }: { userId: number, name?: string, }): GetRequest<User> {
-    const query = toQuery({ userId, name })
+    const query = toQuery({ name })
     return {
       method: 'GET',
       url: `/users/${userId}${query}`,

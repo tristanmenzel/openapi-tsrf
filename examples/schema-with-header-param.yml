@@ -1,0 +1,94 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: Schema with header param
+  description: >
+    Schema with header param
+servers:
+  - url: http://example.com/api/{basePath}
+    variables:
+      basePath:
+        default: v1
+paths:
+  /account/{accountId}/transfers:
+    get:
+      tags:
+        - Accounts
+      summary: account/{accountId}/transfers
+      operationId: GET/account/accountId/transfers
+      description: Gets all transfers related to an account id
+      parameters:
+        - $ref: '#/components/parameters/parameters'
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 96c7819d-0a6a-437a-bbf5-e2747b286965
+        - in: query
+          name: startDate
+          description: When the trade was created.
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          description: When the trade was created.
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: A limit on the number of objects to be returned, between 1 and 100.
+        - in: query
+          name: cursor
+          description: >-
+            A cursor for use in pagination. cursor is an object ID that defines
+            your place in the list. For instance, if you make a list request and
+            receive 100 objects, your response will incude the nextCursor, your
+            subsequent call can include cursor=nextCursor in order to fetch the
+            next page of the list.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                title: TransferGetResponse
+                required:
+                  - data
+                  - message
+                properties:
+                  message:
+                    type: string
+                  nextCursor:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TransferResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  parameters:
+    parameters:
+      in: header
+      name: Accept-Version
+      schema:
+        type: string
+        enum:
+          - '1.0'
+          - '1.1'
+        example: '1.0'
+      required: true

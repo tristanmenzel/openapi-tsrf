@@ -62,4 +62,7 @@ describe('Test examples', () => {
   it('empty-schemas', () => {
     testExample('empty-schemas', writeActuals)
   })
+  it('Schema with header param', () => {
+    testExample('schema-with-header-param', writeActuals, 'yml')
+  })
 })
