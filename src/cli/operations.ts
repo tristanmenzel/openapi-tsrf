@@ -59,7 +59,9 @@ export function* generateOperation(
   yield IncIndent
   if (hasQuery) {
     yield `const query = toQuery({ ${operation
-      .parameters!.map(p => p.name)
+      .parameters!
+        .filter(p => p.in === 'query')
+        .map(p => p.name)
       .join(', ')} })`
   }
   if (requestFormat === 'form') {
