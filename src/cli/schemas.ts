@@ -121,20 +121,35 @@ export function* getSchemaDefinition(
         return
       case 'object':
         const objSchema = schema as Swagger.Schema3
-        yield '{'
-        yield NewLine
-        yield IncIndent
-        for (const [propName, propDef] of iterateDictionary(
-          objSchema.properties,
-        )) {
-          yield propName
-          if (!objSchema.required?.includes(propName)) yield '?'
-          yield ': '
-          yield* getSchemaDefinition(propDef)
-          yield PropertyDelimiter
+        const hasProperties =
+          objSchema.properties && Object.keys(objSchema.properties).length
+        if (hasProperties) {
+          yield '{'
+          yield NewLine
+          yield IncIndent
+          for (const [propName, propDef] of iterateDictionary(
+            objSchema.properties,
+          )) {
+            yield propName
+            if (!objSchema.required?.includes(propName)) yield '?'
+            yield ': '
+            yield* getSchemaDefinition(propDef)
+            yield PropertyDelimiter
+          }
+          yield DecIndent
+          yield '}'
         }
-        yield DecIndent
-        yield '}'
+
+        if (objSchema.additionalProperties) {
+          if (hasProperties) {
+            yield ' & '
+          }
+          yield* getAdditionalPropertiesSchema(objSchema.additionalProperties)
+        } else {
+          if (!hasProperties) {
+            yield '{ }'
+          }
+        }
         return
       case undefined:
         yield '{ /* empty object */ [key in never]: never }'
@@ -147,6 +162,23 @@ export function* getSchemaDefinition(
   } finally {
     yield RestoreLineMode
   }
+}
+
+function* getAdditionalPropertiesSchema(
+  additionalProperties: true | Swagger.BaseSchema,
+) {
+  yield '{'
+  yield NewLine
+  yield IncIndent
+  yield '[key: string]: '
+  if (additionalProperties === true) {
+    yield 'unknown'
+  } else {
+    yield* getSchemaDefinition(additionalProperties)
+  }
+  yield NewLine
+  yield DecIndent
+  yield '}'
 }
 
 /**
