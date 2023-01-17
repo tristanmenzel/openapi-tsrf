@@ -1,0 +1,43 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "1.0.0",
+    "title": ""
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "StringDict": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "NumberDict": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "number"
+        }
+      },
+      "RefDict": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/StringDict"
+        }
+      },
+
+      "MergedWithDict": {
+        "type": "object",
+        "required": ["FixedProp"],
+        "properties": {
+          "FixedProp": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

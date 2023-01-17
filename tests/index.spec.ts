@@ -65,4 +65,7 @@ describe('Test examples', () => {
   it('Schema with header param', () => {
     testExample('schema-with-header-param', writeActuals, 'yml')
   })
+  it('Additional properties', () => {
+    testExample('additional-properties', writeActuals)
+  })
 })

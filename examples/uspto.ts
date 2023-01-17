@@ -23,7 +23,7 @@ export abstract class RequestFactory {
       url: `/${dataset}/${version}/fields`,
     }
   }
-  static performSearch({ body, version, dataset, }: { body: { criteria: string, start?: number, rows?: number, }, version: string, dataset: string, }): PostRequest<{ criteria: string, start?: number, rows?: number, }, Array<{ }>> {
+  static performSearch({ body, version, dataset, }: { body: { criteria: string, start?: number, rows?: number, }, version: string, dataset: string, }): PostRequest<{ criteria: string, start?: number, rows?: number, }, Array<{ [key: string]: { } }>> {
     return {
       method: 'POST',
       url: `/${dataset}/${version}/records`,
