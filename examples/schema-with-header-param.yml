@@ -81,6 +81,9 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 components:
+  schemas:
+    TransferResponse:
+      type: object
   parameters:
     parameters:
       in: header
