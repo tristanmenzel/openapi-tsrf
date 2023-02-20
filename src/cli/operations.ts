@@ -59,9 +59,8 @@ export function* generateOperation(
   yield IncIndent
   if (hasQuery) {
     yield `const query = toQuery({ ${operation
-      .parameters!
-        .filter(p => p.in === 'query')
-        .map(p => p.name)
+      .parameters!.filter(p => p.in === 'query')
+      .map(p => p.name)
       .join(', ')} })`
   }
   if (requestFormat === 'form') {
@@ -164,9 +163,9 @@ export function* generateOperation(
       if (
         Object.values(response.content).some(
           mediaType =>
-            mediaType.schema.type === 'file' ||
-            (mediaType.schema.type === 'string' &&
-              ['byte', 'binary'].includes(mediaType.schema.format!)),
+            mediaType.schema?.type === 'file' ||
+            (mediaType.schema?.type === 'string' &&
+              ['byte', 'binary'].includes(mediaType.schema?.format!)),
         )
       ) {
         return 'Blob'

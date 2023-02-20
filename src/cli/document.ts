@@ -28,11 +28,18 @@ export function* generateDocumentParts(
     yield IncIndent
     for (const [pathStr, pathObj] of iterateDictionary(document.paths)) {
       for (const [method, operation] of methods(pathObj)) {
-        yield* generateOperation(
-          pathStr,
-          method,
-          inlineRefParameters(document, operation),
-        )
+        try {
+          yield* generateOperation(
+            pathStr,
+            method,
+            inlineRefParameters(document, operation),
+          )
+        } catch (error) {
+          throw new Error(
+            `Failed to generate operation for path ${method}:${pathStr}`,
+            { cause: error },
+          )
+        }
       }
     }
     yield DecIndent
