@@ -1,7 +1,6 @@
 export class ParsingError extends Error {
-  constructor(message: string, cause: unknown) {
+  constructor(message: string, public cause: unknown) {
     super(message)
-    this.cause = cause
   }
 
   toString() {
