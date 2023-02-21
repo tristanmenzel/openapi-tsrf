@@ -6,6 +6,7 @@ import { iterateDictionary, methods } from './iteration-helpers'
 import { generateSchema } from './schemas'
 import { generateOperation } from './operations'
 import { notFalsy } from './util'
+import { ParsingError } from './ParsingError'
 
 export function* generateDocumentParts(
   document: Swagger.Spec3,
@@ -35,9 +36,9 @@ export function* generateDocumentParts(
             inlineRefParameters(document, operation),
           )
         } catch (error) {
-          throw new Error(
+          throw new ParsingError(
             `Failed to generate operation for path ${method}:${pathStr}`,
-            { cause: error },
+            error,
           )
         }
       }

@@ -160,6 +160,12 @@ export function* generateOperation(
     if (code === undefined || code === '203' || response.content === undefined)
       return 'undefined'
     if (response.content['application/json'] === undefined) {
+      if (response.content['text/plain']) {
+        return 'string'
+      }
+      if (response.content['application/octet-stream']) {
+        return 'Buffer'
+      }
       if (
         Object.values(response.content).some(
           mediaType =>
