@@ -1,0 +1,72 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "1.0.0",
+    "title": ""
+  },
+  "paths": {
+    "/bananas/{#@&^}": {
+      "get": {
+        "operationId": "getBananas",
+        "parameters": [
+          {
+            "name": "include.b1",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "include.b2",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+
+          {
+            "name": "$dollars",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "#@'&^",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Everything is OK!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Banana"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Banana": {
+        "type": "object",
+        "properties": {
+          "dot.dot": {
+            "type": "string"
+          },
+          "&^&*'\"%": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

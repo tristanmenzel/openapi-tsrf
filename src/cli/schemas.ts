@@ -10,7 +10,10 @@ import {
   PropertyDelimiter,
   RestoreLineMode,
 } from './output'
-import { makeSafeTypeIdentifier } from './sanitization'
+import {
+  makeSafePropertyIdentifier,
+  makeSafeTypeIdentifier,
+} from './sanitization'
 import { typeCheckerFor } from './util'
 
 export function* generateSchema(
@@ -130,7 +133,7 @@ export function* getSchemaDefinition(
           for (const [propName, propDef] of iterateDictionary(
             objSchema.properties,
           )) {
-            yield propName
+            yield makeSafePropertyIdentifier(propName)
             if (!objSchema.required?.includes(propName)) yield '?'
             yield ': '
             yield* getSchemaDefinition(propDef)

@@ -71,4 +71,7 @@ describe('Test examples', () => {
   it('Additional properties', () => {
     testExample('additional-properties', writeActuals)
   })
+  it('Special characters in identifiers', () => {
+    testExample('special-chars-in-identifiers', writeActuals)
+  })
 })
