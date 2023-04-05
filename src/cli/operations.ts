@@ -11,7 +11,12 @@ import {
   formatInline,
 } from './output'
 import { getSchemaDefinition } from './schemas'
-import { makeSafeMethodIdentifier } from './sanitization'
+import {
+  isSafeVariableIdentifier,
+  makeSafeMethodIdentifier,
+  makeSafePropertyIdentifier,
+  makeSafeVariableIdentifier,
+} from './sanitization'
 
 export function* generateOperation(
   path: string,
@@ -62,7 +67,13 @@ export function* generateOperation(
   if (hasQuery) {
     yield `const query = toQuery({ ${operation
       .parameters!.filter(p => p.in === 'query')
-      .map(p => p.name)
+      .map(p =>
+        isSafeVariableIdentifier(p.name)
+          ? p.name
+          : `${makeSafePropertyIdentifier(
+              p.name,
+            )}: ${makeSafeVariableIdentifier(p.name)}`,
+      )
       .join(', ')} })`
   }
   if (requestFormat === 'form') {
@@ -88,11 +99,14 @@ export function* generateOperation(
 
     yield '{ '
     if (bodyParamType) yield 'body, '
-    if (params.length) yield `${params.map(p => p.name).join(', ')}, `
+    if (params.length)
+      yield `${params
+        .map(p => makeSafeVariableIdentifier(p.name))
+        .join(', ')}, `
     yield '}: { '
     if (bodyParamType) yield `body: ${bodyParamType}, `
     for (const param of params) {
-      yield param.name
+      yield makeSafeVariableIdentifier(param.name)
       if (!param.required) yield '?'
       yield ': '
       if (param.type) yield* getSchemaDefinition(param)
@@ -105,7 +119,10 @@ export function* generateOperation(
   function getUrlTemplate(hasQuery: boolean): string {
     const queryPattern = hasQuery ? '${query}' : ''
     if (path.includes('{')) {
-      return `\`${path.replace(/\{[^}]+}/g, val => `$${val}`)}${queryPattern}\``
+      return `\`${path.replace(
+        /\{([^}]+)}/g,
+        (_, val) => `$\{${makeSafeVariableIdentifier(val)}}`,
+      )}${queryPattern}\``
     }
     return queryPattern ? `\`${path}${queryPattern}\`` : `'${path}'`
   }
