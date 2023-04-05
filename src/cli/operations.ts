@@ -22,7 +22,9 @@ export function* generateOperation(
   const [requestFormat, requestBodyType] = getRequestBodyType()
   const responseBodyType = getResponseBodyType()
   const hasQuery = Boolean(operation.parameters?.some(p => p.in === 'query'))
-  yield `static ${makeSafeMethodIdentifier(operation.operationId)}(`
+  yield `static ${makeSafeMethodIdentifier(
+    operation.operationId ?? `${method}_${path}`,
+  )}(`
   // parameters
   yield* parameters(requestBodyType)
   yield '): '
@@ -157,7 +159,12 @@ export function* generateOperation(
       iterateDictionary(operation.responses).find(
         ([code]) => code === 'default',
       ) ?? [undefined, undefined]
-    if (code === undefined || code === '203' || response.content === undefined)
+    if (
+      code === undefined ||
+      code === '203' ||
+      response.content === undefined ||
+      Object.keys(response.content).length === 0
+    )
       return 'undefined'
     if (response.content['application/json'] === undefined) {
       if (response.content['text/plain']) {
