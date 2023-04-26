@@ -31,6 +31,7 @@ export function* generateDocumentParts(
       for (const [method, operation] of methods(pathObj)) {
         try {
           yield* generateOperation(
+            document,
             pathStr,
             method,
             inlineRefParameters(document, operation),
