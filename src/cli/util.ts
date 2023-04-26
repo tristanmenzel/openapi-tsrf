@@ -30,3 +30,7 @@ export const notFalsy = <T>(
 ): value is Exclude<T, 0 | '' | false | null | undefined> => {
   return Boolean(value)
 }
+
+export const throwError = (error: Error): never => {
+  throw error
+}

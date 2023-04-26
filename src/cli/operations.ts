@@ -10,7 +10,11 @@ import {
   NewLineMode,
   formatInline,
 } from './output'
-import { getSchemaDefinition } from './schemas'
+import {
+  getSchemaDefinition,
+  resolveRequestReference,
+  resolveResponseReference,
+} from './schemas'
 import {
   isSafeVariableIdentifier,
   makeSafeMethodIdentifier,
@@ -19,6 +23,7 @@ import {
 } from './sanitization'
 
 export function* generateOperation(
+  document: Swagger.Spec3,
   path: string,
   method: HttpMethod,
   operation: Swagger.Operation3,
@@ -127,6 +132,12 @@ export function* generateOperation(
     return queryPattern ? `\`${path}${queryPattern}\`` : `'${path}'`
   }
 
+  function hasComponentRef<T extends object>(
+    obj: T,
+  ): obj is T & { $ref: string } {
+    return '$ref' in obj && typeof obj.$ref === 'string'
+  }
+
   function getRequestBodyType(): [
     'json' | 'form' | 'na' | 'empty',
     string | undefined,
@@ -136,6 +147,12 @@ export function* generateOperation(
       case 'post':
       case 'patch':
         if (operation.requestBody) {
+          if (hasComponentRef(operation.requestBody)) {
+            operation.requestBody = resolveRequestReference(
+              document,
+              operation.requestBody.$ref,
+            )
+          }
           if (operation.requestBody.content['multipart/form-data'])
             return [
               'form',
@@ -170,21 +187,28 @@ export function* generateOperation(
   }
 
   function getResponseBodyType(): string {
-    const [code, response] = iterateDictionary(operation.responses).find(
-      ([code]) => Number(code) >= 200 && Number(code) < 300,
-    ) ??
+    const [code, responseObjOrRef] = iterateDictionary(
+      operation.responses,
+    ).find(([code]) => Number(code) >= 200 && Number(code) < 300) ??
       iterateDictionary(operation.responses).find(
         ([code]) => code === 'default',
       ) ?? [undefined, undefined]
+    if (code === undefined || code === '203' || !responseObjOrRef)
+      return 'undefined'
+
+    const response = hasComponentRef(responseObjOrRef)
+      ? resolveResponseReference(document, responseObjOrRef.$ref)
+      : responseObjOrRef
+
     if (
-      code === undefined ||
-      code === '203' ||
       response.content === undefined ||
       Object.keys(response.content).length === 0
-    )
+    ) {
       return 'undefined'
+    }
+
     if (response.content['application/json'] === undefined) {
-      if (response.content['text/plain']) {
+      if (response.content['text/plain'] || response.content['text/html']) {
         return 'string'
       }
       if (response.content['application/octet-stream']) {

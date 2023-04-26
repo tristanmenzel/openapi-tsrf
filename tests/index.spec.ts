@@ -74,4 +74,7 @@ describe('Test examples', () => {
   it('Special characters in identifiers', () => {
     testExample('special-chars-in-identifiers', writeActuals)
   })
+  it('request and response body refs', () => {
+    testExample('pet-store-refs', writeActuals)
+  })
 })

@@ -1,5 +1,5 @@
 import { iterateDictionary, yieldMap } from './iteration-helpers'
-import type { Swagger } from './swagger'
+import { Swagger } from './swagger'
 import type { AsyncDocumentParts } from './output'
 import {
   DecIndent,
@@ -14,7 +14,10 @@ import {
   makeSafePropertyIdentifier,
   makeSafeTypeIdentifier,
 } from './sanitization'
-import { typeCheckerFor } from './util'
+import { throwError, typeCheckerFor } from './util'
+import RequestBody = Swagger.RequestBody
+import { ParsingError } from './ParsingError'
+import Response3 = Swagger.Response3
 
 export function* generateSchema(
   name: string,
@@ -33,6 +36,36 @@ function getSchemaNameFromRef($ref: string) {
   if (!$ref.startsWith(schemaPath))
     throw new Error(`Unsupported: $refs must start with ${schemaPath}`)
   return makeSafeTypeIdentifier($ref.substring(schemaPath.length))
+}
+
+export function resolveRequestReference(
+  document: Swagger.Spec3,
+  $ref: string,
+): RequestBody {
+  const requestPath = '#/components/requestBodies/'
+  return (
+    (document.components.requestBodies?.[$ref.substring(requestPath.length)] as
+      | RequestBody
+      | undefined) ??
+    throwError(
+      new ParsingError(`Could not location referenced request body: ${$ref}`),
+    )
+  )
+}
+
+export function resolveResponseReference(
+  document: Swagger.Spec3,
+  $ref: string,
+): Response3 {
+  const responsePath = '#/components/responses/'
+  return (
+    (document.components.responses?.[$ref.substring(responsePath.length)] as
+      | Response3
+      | undefined) ??
+    throwError(
+      new ParsingError(`Could not location referenced response: ${$ref}`),
+    )
+  )
 }
 
 export function* getSchemaDefinition(
