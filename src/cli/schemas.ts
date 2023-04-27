@@ -15,8 +15,8 @@ import {
   makeSafeTypeIdentifier,
 } from './sanitization'
 import { throwError, typeCheckerFor } from './util'
-import RequestBody = Swagger.RequestBody
 import { ParsingError } from './ParsingError'
+import RequestBody = Swagger.RequestBody
 import Response3 = Swagger.Response3
 
 export function* generateSchema(
@@ -91,29 +91,12 @@ export function* getSchemaDefinition(
       yield getSchemaNameFromRef(schema.$ref)
       return
     }
-    if (schema3Checker.hasProp(schema, 'oneOf')) {
-      yield IncIndent
-      if (schema.oneOf.length > 1) yield '('
-      yield* yieldMap(schema.oneOf, getSchemaDefinition, [NewLine, '| '])
-      if (schema.oneOf.length > 1) yield ')'
-      yield DecIndent
-      return
-    }
-    if (schema3Checker.hasProp(schema, 'allOf')) {
-      yield IncIndent
-      if (schema.allOf.length > 1) yield '('
-      yield* yieldMap(schema.allOf, getSchemaDefinition, [NewLine, '& '])
-      if (schema.allOf.length > 1) yield ')'
-      yield DecIndent
-      return
-    }
-    if (schema3Checker.hasProp(schema, 'anyOf')) {
-      yield IncIndent
-      if (schema.anyOf.length > 1) yield '('
-      yield* yieldMap(schema.anyOf, getSchemaDefinition, [NewLine, '| '])
-      if (schema.anyOf.length > 1) yield ')'
-      yield DecIndent
-      return
+
+    if (schemaLooksLikeImplicitObjectType(schema)) {
+      schema = {
+        ...schema,
+        type: 'object',
+      }
     }
     if (schema.enum) {
       yield IncIndent
@@ -127,12 +110,47 @@ export function* getSchemaDefinition(
       yield DecIndent
       return
     }
-
-    if (schemaLooksLikeImplicitObjectType(schema)) {
-      schema = {
-        ...schema,
-        type: 'object',
+    if (schema3Checker.hasProp(schema, 'oneOf')) {
+      yield IncIndent
+      if (schema.oneOf.length > 1) yield '('
+      yield* yieldMap(schema.oneOf, getSchemaDefinition, [NewLine, '| '])
+      // oneOf has been combined with a local object definition
+      if (schema.type === 'object') {
+        yield NewLine
+        yield '| '
+        yield* getObjectDefinition(schema as Swagger.Schema3)
       }
+      if (schema.oneOf.length > 1) yield ')'
+      yield DecIndent
+      return
+    }
+    if (schema3Checker.hasProp(schema, 'allOf')) {
+      yield IncIndent
+      if (schema.allOf.length > 1) yield '('
+      yield* yieldMap(schema.allOf, getSchemaDefinition, [NewLine, '& '])
+      // allOf has been combined with a local object definition
+      if (schema.type === 'object') {
+        yield NewLine
+        yield '& '
+        yield* getObjectDefinition(schema as Swagger.Schema3)
+      }
+      if (schema.allOf.length > 1) yield ')'
+      yield DecIndent
+      return
+    }
+    if (schema3Checker.hasProp(schema, 'anyOf')) {
+      yield IncIndent
+      if (schema.anyOf.length > 1) yield '('
+      yield* yieldMap(schema.anyOf, getSchemaDefinition, [NewLine, '| '])
+      // anyOf has been combined with a local object definition
+      if (schema.type === 'object') {
+        yield NewLine
+        yield '| '
+        yield* getObjectDefinition(schema as Swagger.Schema3)
+      }
+      if (schema.anyOf.length > 1) yield ')'
+      yield DecIndent
+      return
     }
 
     switch (schema.type) {
@@ -157,35 +175,7 @@ export function* getSchemaDefinition(
         return
       case 'object':
         const objSchema = schema as Swagger.Schema3
-        const hasProperties =
-          objSchema.properties && Object.keys(objSchema.properties).length
-        if (hasProperties) {
-          yield '{'
-          yield NewLine
-          yield IncIndent
-          for (const [propName, propDef] of iterateDictionary(
-            objSchema.properties,
-          )) {
-            yield makeSafePropertyIdentifier(propName)
-            if (!objSchema.required?.includes(propName)) yield '?'
-            yield ': '
-            yield* getSchemaDefinition(propDef)
-            yield PropertyDelimiter
-          }
-          yield DecIndent
-          yield '}'
-        }
-
-        if (objSchema.additionalProperties) {
-          if (hasProperties) {
-            yield ' & '
-          }
-          yield* getAdditionalPropertiesSchema(objSchema.additionalProperties)
-        } else {
-          if (!hasProperties) {
-            yield '{ }'
-          }
-        }
+        yield* getObjectDefinition(objSchema)
         return
       case undefined:
         yield '{ /* empty object */ [key in never]: never }'
@@ -197,6 +187,36 @@ export function* getSchemaDefinition(
     }
   } finally {
     yield RestoreLineMode
+  }
+}
+
+function* getObjectDefinition(objSchema: Swagger.Schema3) {
+  const hasProperties =
+    objSchema.properties && Object.keys(objSchema.properties).length
+  if (hasProperties) {
+    yield '{'
+    yield NewLine
+    yield IncIndent
+    for (const [propName, propDef] of iterateDictionary(objSchema.properties)) {
+      yield makeSafePropertyIdentifier(propName)
+      if (!objSchema.required?.includes(propName)) yield '?'
+      yield ': '
+      yield* getSchemaDefinition(propDef)
+      yield PropertyDelimiter
+    }
+    yield DecIndent
+    yield '}'
+  }
+
+  if (objSchema.additionalProperties) {
+    if (hasProperties) {
+      yield ' & '
+    }
+    yield* getAdditionalPropertiesSchema(objSchema.additionalProperties)
+  } else {
+    if (!hasProperties) {
+      yield '{ }'
+    }
   }
 }
 
