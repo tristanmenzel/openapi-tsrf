@@ -145,14 +145,21 @@
       }
     },
     "schemas": {
-      "Pet": {
+      "ObjectWithId": {
         "type": "object",
-        "required": ["id", "name"],
+        "required": ["id"],
         "properties": {
           "id": {
             "type": "integer",
             "format": "int64"
-          },
+          }
+        }
+      },
+      "Pet": {
+        "allOf": [{ "$ref": "#/components/schemas/ObjectWithId" }],
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
           "name": {
             "type": "string"
           },
