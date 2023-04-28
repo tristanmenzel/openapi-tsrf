@@ -14,10 +14,12 @@ import {
   makeSafePropertyIdentifier,
   makeSafeTypeIdentifier,
 } from './sanitization'
-import { throwError, typeCheckerFor } from './util'
+import { notFalsy, throwError, typeCheckerFor } from './util'
 import { ParsingError } from './ParsingError'
 import RequestBody = Swagger.RequestBody
 import Response3 = Swagger.Response3
+import exp from 'constants'
+import Parameter3 = Swagger.Parameter3
 
 export function* generateSchema(
   name: string,
@@ -43,6 +45,10 @@ export function resolveRequestReference(
   $ref: string,
 ): RequestBody {
   const requestPath = '#/components/requestBodies/'
+  if (!$ref.startsWith(requestPath))
+    throw new Error(
+      `Unsupported: Request body $refs must start with ${requestPath}`,
+    )
   return (
     (document.components.requestBodies?.[$ref.substring(requestPath.length)] as
       | RequestBody
@@ -53,11 +59,41 @@ export function resolveRequestReference(
   )
 }
 
+export function hasComponentRef<T extends object>(
+  obj: T,
+): obj is T & { $ref: string } {
+  return '$ref' in obj && typeof obj.$ref === 'string'
+}
+
+export function resolveParameterReference(
+  document: Swagger.Spec3,
+  $ref: string,
+): Parameter3 {
+  const parameterPath = '#/components/parameters/'
+  if (!$ref.startsWith(parameterPath))
+    throw new Error(
+      `Unsupported: Parameter $refs must start with ${parameterPath}`,
+    )
+
+  return (
+    (document.components.parameters?.[$ref.substring(parameterPath.length)] as
+      | Parameter3
+      | undefined) ??
+    throwError(
+      new ParsingError(`Could not location referenced parameter: ${$ref}`),
+    )
+  )
+}
+
 export function resolveResponseReference(
   document: Swagger.Spec3,
   $ref: string,
 ): Response3 {
   const responsePath = '#/components/responses/'
+  if (!$ref.startsWith(responsePath))
+    throw new Error(
+      `Unsupported: Response $refs must start with ${responsePath}`,
+    )
   return (
     (document.components.responses?.[$ref.substring(responsePath.length)] as
       | Response3

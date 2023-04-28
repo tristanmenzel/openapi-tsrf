@@ -12,6 +12,8 @@ import {
 } from './output'
 import {
   getSchemaDefinition,
+  hasComponentRef,
+  resolveParameterReference,
   resolveRequestReference,
   resolveResponseReference,
 } from './schemas'
@@ -130,12 +132,6 @@ export function* generateOperation(
       )}${queryPattern}\``
     }
     return queryPattern ? `\`${path}${queryPattern}\`` : `'${path}'`
-  }
-
-  function hasComponentRef<T extends object>(
-    obj: T,
-  ): obj is T & { $ref: string } {
-    return '$ref' in obj && typeof obj.$ref === 'string'
   }
 
   function getRequestBodyType(): [

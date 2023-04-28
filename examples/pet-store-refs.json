@@ -50,21 +50,39 @@
       }
     },
     "/pets/{petId}": {
+      "parameters": [
+        {
+          "name": "petId",
+          "in": "path",
+          "required": true,
+          "description": "The id of the pet to retrieve",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+
+      "put": {
+        "summary": "Update a pet",
+        "operationId": "updatePets",
+        "tags": ["pets"],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PostPetRequestBody"
+        },
+        "responses": {
+          "200": {
+            "description": "Null response"
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+
       "get": {
         "summary": "Info for a specific pet",
         "operationId": "showPetById",
         "tags": ["pets"],
-        "parameters": [
-          {
-            "name": "petId",
-            "in": "path",
-            "required": true,
-            "description": "The id of the pet to retrieve",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Expected response to a valid request",
