@@ -35,4 +35,11 @@ export abstract class RequestFactory {
       url: `/pets/${petId}`,
     }
   }
+  static updatePets({ body, petId, }: { body: Pet, petId: string, }): PutRequest<Pet, undefined> {
+    return {
+      method: 'PUT',
+      url: `/pets/${petId}`,
+      data: body,
+    }
+  }
 }

@@ -1,11 +1,13 @@
 import type { Swagger } from './swagger'
 import type { AsyncDocumentParts } from './output'
 import { DecIndent, IncIndent } from './output'
-
 import { iterateDictionary, methods } from './iteration-helpers'
-import { generateSchema } from './schemas'
+import {
+  generateSchema,
+  hasComponentRef,
+  resolveParameterReference,
+} from './schemas'
 import { generateOperation } from './operations'
-import { notFalsy } from './util'
 import { ParsingError } from './ParsingError'
 
 export function* generateDocumentParts(
@@ -30,12 +32,22 @@ export function* generateDocumentParts(
     for (const [pathStr, pathObj] of iterateDictionary(document.paths)) {
       for (const [method, operation] of methods(pathObj)) {
         try {
-          yield* generateOperation(
-            document,
-            pathStr,
-            method,
-            inlineRefParameters(document, operation),
+          const pathParams = pathObj.parameters?.map(p =>
+            hasComponentRef(p)
+              ? resolveParameterReference(document, p.$ref)
+              : p,
           )
+          yield* generateOperation(document, pathStr, method, {
+            ...operation,
+            parameters: [
+              ...(operation.parameters?.map(p =>
+                hasComponentRef(p)
+                  ? resolveParameterReference(document, p.$ref)
+                  : p,
+              ) ?? []),
+              ...(pathParams ?? []),
+            ],
+          })
         } catch (error) {
           throw new ParsingError(
             `Failed to generate operation for path ${method}:${pathStr}`,
@@ -47,27 +59,4 @@ export function* generateDocumentParts(
     yield DecIndent
     yield '}'
   }
-}
-
-function inlineRefParameters(
-  document: Swagger.Spec3,
-  operation: Swagger.Operation3,
-): Swagger.Operation3 {
-  return {
-    ...operation,
-    parameters: operation.parameters
-      ?.map(p =>
-        p.$ref
-          ? document.components?.parameters?.[getParameterNameFromRef(p.$ref)]
-          : p,
-      )
-      .filter(notFalsy),
-  }
-}
-
-function getParameterNameFromRef($ref: string) {
-  const parameterPath = '#/components/parameters/'
-  if (!$ref.startsWith(parameterPath))
-    throw new Error(`Unsupported: $refs must start with ${parameterPath}`)
-  return $ref.substring(parameterPath.length)
 }
