@@ -311,7 +311,12 @@ export declare namespace Swagger {
     properties?: {
       [propertyName: string]: Schema3
     }
-    discriminator?: string
+    discriminator?: string | {
+      propertyName: string
+      mapping?: {
+        [discriminatorValue: string]: string
+      }
+    }
     readOnly?: boolean
     xml?: XML
     externalDocs?: ExternalDocs

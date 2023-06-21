@@ -14,11 +14,10 @@ import {
   makeSafePropertyIdentifier,
   makeSafeTypeIdentifier,
 } from './sanitization'
-import { notFalsy, throwError, typeCheckerFor } from './util'
+import { throwError, typeCheckerFor } from './util'
 import { ParsingError } from './ParsingError'
 import RequestBody = Swagger.RequestBody
 import Response3 = Swagger.Response3
-import exp from 'constants'
 import Parameter3 = Swagger.Parameter3
 
 export function* generateSchema(
@@ -146,17 +145,36 @@ export function* getSchemaDefinition(
       yield DecIndent
       return
     }
+    /*
+     * It is possible to define a discriminated union using a mapping object rather than just using oneOf
+     * https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/
+     */
+    if (hasDiscriminatorMapping(schema)) {
+      const mappedSchemas = Object.values(schema.discriminator.mapping).map(x => ({ $ref: x }))
+      yield IncIndent
+      if (mappedSchemas.length > 1) yield '('
+      yield* yieldMap(mappedSchemas, getSchemaDefinition, [NewLine, '| '])
+      if (mappedSchemas.length > 1) yield ')'
+      // oneOf has been combined with a local object definition
+      if (schema.type === 'object') {
+        yield NewLine
+        yield '& '
+        yield* getObjectDefinition(schema as Swagger.Schema3)
+      }
+      yield DecIndent
+      return
+    }
     if (schema3Checker.hasProp(schema, 'oneOf')) {
       yield IncIndent
       if (schema.oneOf.length > 1) yield '('
       yield* yieldMap(schema.oneOf, getSchemaDefinition, [NewLine, '| '])
+      if (schema.oneOf.length > 1) yield ')'
       // oneOf has been combined with a local object definition
       if (schema.type === 'object') {
         yield NewLine
-        yield '| '
+        yield '& '
         yield* getObjectDefinition(schema as Swagger.Schema3)
       }
-      if (schema.oneOf.length > 1) yield ')'
       yield DecIndent
       return
     }
@@ -287,4 +305,14 @@ function schemaLooksLikeImplicitObjectType(
     maybeObjSchema.properties !== undefined &&
     Object.keys(maybeObjSchema.properties).length > 0
   )
+}
+
+function hasDiscriminatorMapping( schema: Swagger.Schema3 | Swagger.BaseSchema,
+    ): schema is {discriminator: {mapping: string[]}} & Swagger.Schema3 {
+  if (!('discriminator' in schema)) return false
+  const discriminatorSchema = schema.discriminator
+  if ( typeof discriminatorSchema === 'object' && 'mapping' in discriminatorSchema && typeof discriminatorSchema.mapping === 'object' && discriminatorSchema.mapping) {
+    return Object.values(discriminatorSchema.mapping).every(x => typeof x === 'string')
+  }
+  return false
 }

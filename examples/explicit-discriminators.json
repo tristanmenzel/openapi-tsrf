@@ -1,0 +1,82 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "1.0.0",
+    "title": ""
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AnimalImplicit": {
+        "type": "object",
+        "required": [
+          "weight"
+        ],
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/Dog"
+          },
+          {
+            "$ref": "#/components/schemas/Cat"
+          }
+        ],
+        "properties": {
+          "weight": {
+            "type": "integer"
+          }
+        }
+      },
+      "AnimalExplicit": {
+        "type": "object",
+        "required": [
+          "weight"
+        ],
+        "discriminator":
+        {
+          "propertyName": "species",
+          "mapping": {
+            "dog":"#/components/schemas/Dog",
+            "cat":"#/components/schemas/Cat"
+          }
+        },
+        "properties": {
+          "weight": {
+            "type": "integer"
+          }
+        }
+      },
+      "Dog": {
+        "type": "object",
+        "properties": {
+          "shedding": {
+            "type": "boolean"
+          },
+          "likes-fetch": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "species": {
+            "enum": ["dog"]
+          }
+        }
+      },
+      "Cat": {
+        "type": "object",
+        "properties": {
+          "likes-scratching-your-face": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "species": {
+            "enum": ["cat"]
+          }
+        }
+      }
+
+    }
+  }
+}
