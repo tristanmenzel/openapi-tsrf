@@ -77,4 +77,7 @@ describe('Test examples', () => {
   it('request and response body refs', () => {
     testExample('pet-store-refs', writeActuals)
   })
+  it('explicit discriminators', () => {
+    testExample('explicit-discriminators', writeActuals)
+  })
 })
