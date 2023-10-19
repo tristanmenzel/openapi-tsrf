@@ -19,6 +19,10 @@ program
     '--disable-eslint',
     'Add /* eslint-disable */ to the top of the output file',
   )
+  .option(
+    '-h --header <string>',
+    'Add a header to the top of the output file'
+  )
   .action(
     (options: {
       openapi: string
@@ -42,6 +46,7 @@ program
 
       writeDocumentPartsToStream(output, file, {
         disableEslint: options.disableEslint,
+        header: options.header
       })
       file.end()
     },
