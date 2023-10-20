@@ -4,7 +4,7 @@
   "description": "Generates request factories for all discovered operations in an open api 3 document",
   "repository": "https://github.com/tristanmenzel/openapi-tsrf.git",
   "scripts": {
-    "check-types": "tsc",
+    "check-types": "tsc -p tsconfig.cli.json --noEmit && tsc -p tsconfig.runtime.json --noEmit",
     "build": "run-s build:*",
     "build:0-clean": "rimraf dist",
     "build:1-build-cli": "tsc -p tsconfig.cli.json",

@@ -33,3 +33,9 @@ jobs:
 
       - name: Run tests
         run: npm run test:ci
+
+      - name: Check linting
+        run: npm run lint
+
+      - name: Check types
+        run: npm run check-types
