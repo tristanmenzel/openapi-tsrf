@@ -19,15 +19,13 @@ program
     '--disable-eslint',
     'Add /* eslint-disable */ to the top of the output file',
   )
-  .option(
-    '-h --header <string>',
-    'Add a header to the top of the output file'
-  )
+  .option('-h --header <string>', 'Add a header to the top of the output file')
   .action(
     (options: {
       openapi: string
       requestFactory: string
       disableEslint: boolean
+      header?: string
     }) => {
       console.debug(options)
       if (!options.openapi || !fs.existsSync(options.openapi)) {
@@ -46,7 +44,7 @@ program
 
       writeDocumentPartsToStream(output, file, {
         disableEslint: options.disableEslint,
-        header: options.header
+        header: options.header,
       })
       file.end()
     },
