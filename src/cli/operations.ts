@@ -34,6 +34,7 @@ export function* generateOperation(
   const [requestFormat, requestBodyType] = getRequestBodyType()
   const responseBodyType = getResponseBodyType()
   const hasQuery = Boolean(operation.parameters?.some(p => p.in === 'query'))
+  const hasHeaders = Boolean(operation.parameters?.some(p => p.in === 'header'))
   yield `static ${makeSafeMethodIdentifier(
     operation.operationId ?? `${method}_${path}`,
   )}(`
@@ -83,6 +84,17 @@ export function* generateOperation(
       )
       .join(', ')} })`
   }
+  if (hasHeaders) {
+    yield `const headers = toHeaders({ ${operation
+        .parameters!.filter(p => p.in === 'header')
+        .map(p => isSafeVariableIdentifier(p.name)
+            ? p.name
+            : `${makeSafePropertyIdentifier(
+                p.name,
+            )}: ${makeSafeVariableIdentifier(p.name)}`,
+        )
+        .join(', ')} })`
+  }
   if (requestFormat === 'form') {
     yield 'const formData = toFormData(body)'
   }
@@ -93,6 +105,7 @@ export function* generateOperation(
   if (requestFormat === 'json') yield 'data: body,'
   if (requestFormat === 'form') yield 'data: formData,'
   if (requestFormat === 'empty') yield 'data: undefined,'
+  if (hasHeaders) yield 'headers,'
   yield DecIndent
   yield '}'
   yield DecIndent
@@ -100,7 +113,7 @@ export function* generateOperation(
 
   function* parameters(bodyParamType: string | undefined): AsyncDocumentParts {
     const params =
-      operation.parameters?.filter(p => p.in === 'path' || p.in === 'query') ??
+      operation.parameters?.filter(p => p.in === 'path' || p.in === 'query' || p.in === 'header') ??
       []
     if (params.length === 0 && bodyParamType === undefined) return
 

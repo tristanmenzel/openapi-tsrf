@@ -76,7 +76,8 @@ interface RequestConfig {
 }
 
 const factory = new ApiProxyFactory<RequestConfig>(
-  async <TResponse>({ url, method, ...rest }: AnyRequest<TResponse>, config?: RequestConfig) => {
+  async <TResponse>({ url, method, headers, ...rest }: AnyRequest<TResponse>, config?: RequestConfig) => {
+    headers = headers ?? new Headers()
     const init: RequestInit = {
       method,
       redirect: 'manual',
@@ -88,11 +89,11 @@ const factory = new ApiProxyFactory<RequestConfig>(
         init.body = data
       } else {
         init.body = JSON.stringify(data)
-        init.headers = {
-          'Content-Type': 'application/json',
-        }
+        headers.append('Content-Type', 'application/json')
       }
     }
+    
+    init.headers = headers
 
     const fetchResult = await fetch(url, init)
 

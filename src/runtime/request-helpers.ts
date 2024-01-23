@@ -18,3 +18,9 @@ export const toFormData = (o: Record<string, any>): FormData => {
   Object.entries(o).forEach(([key, data]) => fd.append(key, data))
   return fd
 }
+
+export const toHeaders = (o: { [key: string]: any }): Headers => {
+    const h = new Headers()
+    Object.entries(o).forEach(([key, data]) => h.append(key, data))
+    return h
+}

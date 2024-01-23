@@ -1,6 +1,6 @@
 /* eslint-disable */
 import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf-runtime'
-import { toQuery, toFormData } from 'openapi-tsrf-runtime'
+import { toQuery, toFormData, toHeaders } from 'openapi-tsrf-runtime'
 export type Pet = {
   id: number
   name: string
