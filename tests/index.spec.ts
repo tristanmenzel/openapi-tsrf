@@ -10,13 +10,14 @@ describe('Test examples', () => {
     exampleName: string,
     writeActual: boolean,
     ext: string = 'json',
+    includeHeaders: string[] = [],
   ) {
     const openApiDoc = loadOpenApi3(
       path.join(__dirname, `../examples/${exampleName}.${ext}`),
     )
 
     const result = writeDocumentPartsToString(
-      generateDocumentParts(openApiDoc),
+      generateDocumentParts(openApiDoc, includeHeaders),
       {
         disableEslint: true,
       },
@@ -79,5 +80,13 @@ describe('Test examples', () => {
   })
   it('explicit discriminators', () => {
     testExample('explicit-discriminators', writeActuals)
+  })
+  it('Schema with all headers', () => {
+    testExample('schema-with-all-headers', writeActuals, 'json', ['*'])
+  })
+  it('Schema with some headers', () => {
+    testExample('schema-with-some-headers', writeActuals, 'json', [
+      'x-rocks-are-pets',
+    ])
   })
 })

@@ -28,13 +28,20 @@ export function* generateOperation(
   document: Swagger.Spec3,
   path: string,
   method: HttpMethod,
+  includeHeaders: string[],
   operation: Swagger.Operation3,
 ): AsyncDocumentParts {
   yield InlineMode
   const [requestFormat, requestBodyType] = getRequestBodyType()
   const responseBodyType = getResponseBodyType()
   const hasQuery = Boolean(operation.parameters?.some(p => p.in === 'query'))
-  const hasHeaders = Boolean(operation.parameters?.some(p => p.in === 'header'))
+  const hasHeaders = Boolean(
+    operation.parameters?.some(
+      p =>
+        p.in === 'header' &&
+        (includeHeaders.includes(p.name) || includeHeaders.includes('*')),
+    ),
+  )
   yield `static ${makeSafeMethodIdentifier(
     operation.operationId ?? `${method}_${path}`,
   )}(`
@@ -86,14 +93,19 @@ export function* generateOperation(
   }
   if (hasHeaders) {
     yield `const headers = toHeaders({ ${operation
-        .parameters!.filter(p => p.in === 'header')
-        .map(p => isSafeVariableIdentifier(p.name)
-            ? p.name
-            : `${makeSafePropertyIdentifier(
-                p.name,
+      .parameters!.filter(
+        p =>
+          p.in === 'header' &&
+          (includeHeaders.includes(p.name) || includeHeaders.includes('*')),
+      )
+      .map(p =>
+        isSafeVariableIdentifier(p.name)
+          ? p.name
+          : `${makeSafePropertyIdentifier(
+              p.name,
             )}: ${makeSafeVariableIdentifier(p.name)}`,
-        )
-        .join(', ')} })`
+      )
+      .join(', ')} })`
   }
   if (requestFormat === 'form') {
     yield 'const formData = toFormData(body)'
@@ -113,8 +125,13 @@ export function* generateOperation(
 
   function* parameters(bodyParamType: string | undefined): AsyncDocumentParts {
     const params =
-      operation.parameters?.filter(p => p.in === 'path' || p.in === 'query' || p.in === 'header') ??
-      []
+      operation.parameters?.filter(
+        p =>
+          p.in === 'path' ||
+          p.in === 'query' ||
+          (p.in === 'header' &&
+            (includeHeaders.includes(p.name) || includeHeaders.includes('*'))),
+      ) ?? []
     if (params.length === 0 && bodyParamType === undefined) return
 
     yield '{ '

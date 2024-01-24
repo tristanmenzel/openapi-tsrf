@@ -12,6 +12,7 @@ import { ParsingError } from './ParsingError'
 
 export function* generateDocumentParts(
   document: Swagger.Spec3,
+  includeHeaders: string[] = [],
 ): AsyncDocumentParts {
   const hasOperations =
     iterateDictionary(document.paths).flatMap(([_, pathObj]) =>
@@ -37,7 +38,7 @@ export function* generateDocumentParts(
               ? resolveParameterReference(document, p.$ref)
               : p,
           )
-          yield* generateOperation(document, pathStr, method, {
+          yield* generateOperation(document, pathStr, method, includeHeaders, {
             ...operation,
             parameters: [
               ...(operation.parameters?.map(p =>

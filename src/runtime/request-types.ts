@@ -1,35 +1,35 @@
 export interface GetRequest<TResponse> {
   url: string
   method: 'GET'
-  headers?: Headers
+  headers?: Record<string, any>
 }
 export interface OptionsRequest<TResponse> {
   url: string
   method: 'OPTIONS'
-  headers?: Headers
+  headers?: Record<string, any>
 }
 export interface DeleteRequest<TResponse> {
   url: string
   method: 'DELETE'
-  headers?: Headers
+  headers?: Record<string, any>
 }
 export interface PostRequest<TRequest, TResponse> {
   data: TRequest
   url: string
   method: 'POST'
-  headers?: Headers
+  headers?: Record<string, any>
 }
 export interface PatchRequest<TRequest, TResponse> {
   data: TRequest
   url: string
   method: 'PATCH'
-  headers?: Headers
+  headers?: Record<string, any>
 }
 export interface PutRequest<TRequest, TResponse> {
   data: TRequest
   url: string
   method: 'PUT'
-  headers?: Headers
+  headers?: Record<string, any>
 }
 
 export type AnyRequest<TResponse> =
