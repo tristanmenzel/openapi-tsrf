@@ -37,7 +37,7 @@ Alternatively you can import `generateDocumentParts` directly into your code and
 
 By default, HTTP headers will not be included as part of a request. You can include headers by using the `--include-headers` flag in the cli. Headers can be included in the following ways: 
 * `--include-headers *` - Include all headers defined in the swagger document.
-* `--include-headers header1 header2` - Include only the headers specified when they occur in a path and method
+* `--include-headers header1 header2` - Include only the specified headers
 
 ## Usage - Manual
 
