@@ -19,7 +19,9 @@ export const toFormData = (o: Record<string, any>): FormData => {
   return fd
 }
 
-export const toHeaders = (o: { [key: string]: any }): Record<string, any> => {
+export const toHeaders = (o: {
+  [key: string]: any
+}): Record<string, string> => {
   const h = Object.keys(o)
     .map(k => ({ k, v: o[k] }))
     .filter(x => x.v !== undefined && x.v !== null)
