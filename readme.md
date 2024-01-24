@@ -6,7 +6,7 @@ A request object includes
  - The `url` for the operation including path and query params
  - The `method` for the operation (ie. get, put, post, delete, patch, options)
  - The request body of the operation (if applicable) stored in the `data` property. 
- - The `headers` for the operation if specified in when generating the factory
+ - The `headers` for the operation specified when generating the request factory
  - A generic type parameter defining what a successful response body looks like
 
 
