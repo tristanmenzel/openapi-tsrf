@@ -18,16 +18,3 @@ export const toFormData = (o: Record<string, any>): FormData => {
   Object.entries(o).forEach(([key, data]) => fd.append(key, data))
   return fd
 }
-
-export const toHeaders = (o: {
-  [key: string]: any
-}): Record<string, string> => {
-  const h = Object.keys(o)
-    .map(k => ({ k, v: o[k] }))
-    .filter(x => x.v !== undefined && x.v !== null)
-    .reduce((acc, x) => {
-      acc[x.k] = x.v
-      return acc
-    }, {} as Record<string, any>)
-  return h
-}

@@ -91,8 +91,18 @@ export function* generateOperation(
       )
       .join(', ')} })`
   }
-  if (hasHeaders) {
-    yield `const headers = toHeaders({ ${operation
+  if (requestFormat === 'form') {
+    yield 'const formData = toFormData(body)'
+  }
+  yield 'return {'
+  yield IncIndent
+  yield `method: '${method.toUpperCase()}',`
+  yield `url: ${getUrlTemplate(hasQuery)},`
+  if (requestFormat === 'json') yield 'data: body,'
+  if (requestFormat === 'form') yield 'data: formData,'
+  if (requestFormat === 'empty') yield 'data: undefined,'
+  if (hasHeaders)
+    yield `headers: { ${operation
       .parameters!.filter(
         p =>
           p.in === 'header' &&
@@ -105,19 +115,7 @@ export function* generateOperation(
               p.name,
             )}: ${makeSafeVariableIdentifier(p.name)}`,
       )
-      .join(', ')} })`
-  }
-  if (requestFormat === 'form') {
-    yield 'const formData = toFormData(body)'
-  }
-  yield 'return {'
-  yield IncIndent
-  yield `method: '${method.toUpperCase()}',`
-  yield `url: ${getUrlTemplate(hasQuery)},`
-  if (requestFormat === 'json') yield 'data: body,'
-  if (requestFormat === 'form') yield 'data: formData,'
-  if (requestFormat === 'empty') yield 'data: undefined,'
-  if (hasHeaders) yield 'headers,'
+      .join(', ')} },`
   yield DecIndent
   yield '}'
   yield DecIndent

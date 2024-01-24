@@ -20,7 +20,7 @@ export function* generateDocumentParts(
     ).length > 0
   if (hasOperations) {
     yield "import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf-runtime'"
-    yield "import { toQuery, toFormData, toHeaders } from 'openapi-tsrf-runtime'"
+    yield "import { toQuery, toFormData } from 'openapi-tsrf-runtime'"
   }
   for (const [name, schemaObj] of iterateDictionary(
     document.components.schemas,

@@ -88,7 +88,7 @@ const factory = new ApiProxyFactory<RequestConfig>(
       method,
       redirect: 'manual',
       credentials: config?.credentials ?? 'same-origin',
-      headers: headers
+      headers,
     }
     const data = (rest as any)?.data
     if (['POST', 'PUT', 'PATCH'].includes(method) && data !== undefined) {
@@ -98,7 +98,7 @@ const factory = new ApiProxyFactory<RequestConfig>(
         init.body = JSON.stringify(data)
         init.headers = {
           'Content-Type': 'application/json',
-          ...headers,
+          ...init.headers,
         }
       }
     }

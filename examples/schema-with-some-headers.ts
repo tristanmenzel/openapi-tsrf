@@ -1,6 +1,6 @@
 /* eslint-disable */
 import type { GetRequest, PostRequest, PutRequest, PatchRequest, OptionsRequest, DeleteRequest } from 'openapi-tsrf-runtime'
-import { toQuery, toFormData, toHeaders } from 'openapi-tsrf-runtime'
+import { toQuery, toFormData } from 'openapi-tsrf-runtime'
 export type Pet = {
   id: number
   name: string
@@ -14,11 +14,10 @@ export type Error = {
 export abstract class RequestFactory {
   static listPets({ limit, xRocksArePets, }: { limit?: number, xRocksArePets?: boolean, }): GetRequest<Pets> {
     const query = toQuery({ limit })
-    const headers = toHeaders({ 'x-rocks-are-pets': xRocksArePets })
     return {
       method: 'GET',
       url: `/pets${query}`,
-      headers,
+      headers: { 'x-rocks-are-pets': xRocksArePets },
     }
   }
 }
