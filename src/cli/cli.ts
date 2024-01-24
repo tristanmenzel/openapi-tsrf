@@ -20,12 +20,14 @@ program
     'Add /* eslint-disable */ to the top of the output file',
   )
   .option('-h --header <string>', 'Add a header to the top of the output file')
+  .option('-ih --include-headers <value...>', 'HTTP headers to be passed through in requests')
   .action(
     (options: {
       openapi: string
       requestFactory: string
       disableEslint: boolean
       header?: string
+      includeHeaders?: string[]
     }) => {
       console.debug(options)
       if (!options.openapi || !fs.existsSync(options.openapi)) {
@@ -36,7 +38,7 @@ program
       }
 
       const openapiDoc = loadOpenApi3(options.openapi)
-      const output = generateDocumentParts(openapiDoc)
+      const output = generateDocumentParts(openapiDoc, options.includeHeaders)
 
       const file = fs.createWriteStream(options.requestFactory, {
         flags: 'w',

@@ -6,6 +6,7 @@ A request object includes
  - The `url` for the operation including path and query params
  - The `method` for the operation (ie. get, put, post, delete, patch, options)
  - The request body of the operation (if applicable) stored in the `data` property. 
+ - The `headers` for the operation specified when generating the request factory
  - A generic type parameter defining what a successful response body looks like
 
 
@@ -31,6 +32,12 @@ Add a new script to your package.json
 ```
 
 Alternatively you can import `generateDocumentParts` directly into your code and use it directly (with the aid of `writeDocumentPartsToString` or `writeDocumentPartsToStream` for formatting).
+
+## HTTP Headers
+
+By default, HTTP headers will not be included as part of a request. You can include headers by using the `--include-headers` flag in the cli. Headers can be included in the following ways: 
+* `--include-headers *` - Include all headers defined in the swagger document.
+* `--include-headers header1 header2` - Include only the specified headers
 
 ## Usage - Manual
 
@@ -76,11 +83,12 @@ interface RequestConfig {
 }
 
 const factory = new ApiProxyFactory<RequestConfig>(
-  async <TResponse>({ url, method, ...rest }: AnyRequest<TResponse>, config?: RequestConfig) => {
+  async <TResponse>({ url, method, headers, ...rest }: AnyRequest<TResponse>, config?: RequestConfig) => {
     const init: RequestInit = {
       method,
       redirect: 'manual',
       credentials: config?.credentials ?? 'same-origin',
+      headers,
     }
     const data = (rest as any)?.data
     if (['POST', 'PUT', 'PATCH'].includes(method) && data !== undefined) {
@@ -90,10 +98,10 @@ const factory = new ApiProxyFactory<RequestConfig>(
         init.body = JSON.stringify(data)
         init.headers = {
           'Content-Type': 'application/json',
+          ...init.headers,
         }
       }
     }
-
     const fetchResult = await fetch(url, init)
 
     if (!fetchResult.ok) {
