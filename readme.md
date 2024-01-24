@@ -102,7 +102,6 @@ const factory = new ApiProxyFactory<RequestConfig>(
         }
       }
     }
-    
     const fetchResult = await fetch(url, init)
 
     if (!fetchResult.ok) {
