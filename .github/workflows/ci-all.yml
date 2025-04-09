@@ -1,0 +1,40 @@
+on:
+  workflow_call:
+
+jobs:
+  ci-openapi-tsrf-cli:
+    name: 'Build openapi-tsrf-cli'
+    uses: ./.github/workflows/node-ci.yml
+    with:
+      node-version: 22.x
+      run-build: true
+      audit-script: npm run audit
+      working-directory: packages/cli
+      upload-artifact-name: cli
+      upload-artifact-path: ./packages/cli/dist
+
+  ci-openapi-tsrf-runtime:
+    name: 'Build openapi-tsrf-runtime'
+    uses: ./.github/workflows/node-ci.yml
+    with:
+      node-version: 22.x
+      run-build: true
+      audit-script: npm run audit
+      working-directory: packages/runtime
+      upload-artifact-name: runtime
+      upload-artifact-path: ./packages/runtime/dist
+
+  ci-tests:
+    name: 'Run tests'
+    uses: ./.github/workflows/node-ci.yml
+    needs:
+      - ci-openapi-tsrf-cli
+      - ci-openapi-tsrf-runtime
+    with:
+      download-artifact-path: ./packages-temp
+      pre-run-script: |
+        mv packages-temp/cli packages/cli/dist
+        mv packages-temp/runtime packages/cli/runtime
+      node-version: 22.x
+      run-build: false
+      test-script: npm run test:ci
