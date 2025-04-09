@@ -1,37 +1,20 @@
-import { generateDocumentParts, writeDocumentPartsToString } from '../src/cli'
-import { loadOpenApi3 } from '../src/cli/util'
+import { generateDocumentParts, writeDocumentPartsToString } from 'openapi-tsrf-cli'
+import { loadOpenApi3 } from 'openapi-tsrf-cli'
 import * as path from 'path'
 import * as fs from 'fs'
-
+import { describe, expect, it } from 'vitest'
 const writeActuals = process.env.TEST_ENV !== 'ci'
 
 describe('Test examples', () => {
-  function testExample(
-    exampleName: string,
-    writeActual: boolean,
-    ext: string = 'json',
-    includeHeaders: string[] = [],
-  ) {
-    const openApiDoc = loadOpenApi3(
-      path.join(__dirname, `../examples/${exampleName}.${ext}`),
-    )
+  function testExample(exampleName: string, writeActual: boolean, ext: string = 'json', includeHeaders: string[] = []) {
+    const openApiDoc = loadOpenApi3(path.join(__dirname, `../examples/${exampleName}.${ext}`))
 
-    const result = writeDocumentPartsToString(
-      generateDocumentParts(openApiDoc, includeHeaders),
-      {
-        disableEslint: true,
-      },
-    )
-    if (writeActual)
-      fs.writeFileSync(
-        path.join(__dirname, `../examples/${exampleName}.actual.ts`),
-        result,
-      )
+    const result = writeDocumentPartsToString(generateDocumentParts(openApiDoc, includeHeaders), {
+      disableEslint: true,
+    })
+    if (writeActual) fs.writeFileSync(path.join(__dirname, `../examples/${exampleName}.actual.ts`), result)
 
-    const approvalDoc = fs.readFileSync(
-      path.join(__dirname, `../examples/${exampleName}.ts`),
-      'utf-8',
-    )
+    const approvalDoc = fs.readFileSync(path.join(__dirname, `../examples/${exampleName}.ts`), 'utf-8')
 
     expect(result).toBe(approvalDoc)
   }
@@ -85,8 +68,6 @@ describe('Test examples', () => {
     testExample('schema-with-all-headers', writeActuals, 'json', ['*'])
   })
   it('Schema with some headers', () => {
-    testExample('schema-with-some-headers', writeActuals, 'json', [
-      'x-rocks-are-pets',
-    ])
+    testExample('schema-with-some-headers', writeActuals, 'json', ['x-rocks-are-pets'])
   })
 })
